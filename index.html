@@ -2,503 +2,592 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Simulador Dinámico - Examen Complexivo</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>Ficha de Repaso — Examen Complexivo</title>
 <style>
-:root {
-  --bg:#f4f6f8; --panel:#ffffff; --text:#18202a; --muted:#677281; --line:#dfe4ea;
-  --brand:#1f2937; --brand2:#3b82f6; --good:#15803d; --goodbg:#ecfdf3;
-  --bad:#b42318; --badbg:#fff1f0; --warn:#b45309; --shadow:0 18px 45px rgba(20,30,50,.09);
-}
-*{box-sizing:border-box}
-body{margin:0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:linear-gradient(145deg,#eef2f7,#f9fafb 50%,#eef4ff);color:var(--text);min-height:100vh}
-button,select{font:inherit}
-.app{max-width:980px;margin:0 auto;padding:22px 16px 40px}
-.header{display:flex;justify-content:space-between;gap:14px;align-items:center;margin-bottom:18px}
-.brand h1{font-size:clamp(22px,4vw,34px);margin:0;line-height:1.1}
-.brand p{margin:6px 0 0;color:var(--muted);font-size:14px}
-.pill{padding:8px 11px;border-radius:999px;background:#fff;border:1px solid var(--line);font-size:13px;color:var(--muted);box-shadow:0 3px 12px rgba(0,0,0,.03)}
-.panel{background:rgba(255,255,255,.96);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);overflow:hidden}
-.setup{padding:26px}
-.setup h2{margin:0 0 8px;font-size:24px}
-.setup p{margin:0 0 24px;color:var(--muted)}
-.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
-.field{border:1px solid var(--line);border-radius:16px;padding:16px;background:#fafbfc}
-.field label{display:block;font-weight:700;margin-bottom:8px}
-.field small{display:block;color:var(--muted);margin-top:7px;line-height:1.35}
-select{width:100%;padding:11px 12px;border-radius:11px;border:1px solid #cfd6de;background:#fff;color:var(--text)}
-.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
-.btn{border:0;border-radius:12px;padding:12px 17px;min-height:46px;font-weight:750;cursor:pointer;transition:.18s transform,.18s opacity,.18s background}
-.btn:hover{transform:translateY(-1px)} .btn:active{transform:translateY(0)}
-.btn.primary{background:var(--brand);color:#fff}
-.btn.blue{background:var(--brand2);color:#fff}
-.btn.secondary{background:#fff;border:1px solid var(--line);color:var(--text)}
-.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--muted)}
-.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
-.quiz{display:none}
-.toolbar{padding:16px 20px;border-bottom:1px solid var(--line);display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center}
-.stats{display:flex;gap:9px;flex-wrap:wrap}
-.stat{font-size:13px;padding:7px 10px;border:1px solid var(--line);border-radius:999px;background:#fff}
-.stat strong{font-size:14px}
-.timer{font-variant-numeric:tabular-nums;font-weight:800}
-.progress-wrap{height:8px;background:#edf0f3}
-.progress{height:100%;width:0;background:linear-gradient(90deg,#2563eb,#60a5fa);transition:width .28s ease}
-.card{padding:clamp(18px,4vw,32px)}
-.meta{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:12px;color:var(--muted);font-size:13px}
-.question{font-size:clamp(19px,3vw,26px);line-height:1.42;font-weight:800;margin:0 0 22px;white-space:pre-line}
-.options{display:grid;gap:12px}
-.option{width:100%;display:flex;gap:12px;align-items:flex-start;text-align:left;border:1px solid #d6dce3;background:#fff;border-radius:15px;padding:15px 16px;cursor:pointer;color:var(--text);transition:.15s border,.15s transform,.15s background}
-.option:hover{border-color:#9db7dd;transform:translateY(-1px);background:#fbfdff}
-.option .letter{flex:0 0 30px;height:30px;border-radius:9px;background:#eef2f7;display:grid;place-items:center;font-weight:900}
-.option.correct{border-color:#22a35a;background:var(--goodbg)}
-.option.correct .letter{background:#d7f5e2;color:var(--good)}
-.option.wrong{border-color:#d65d55;background:var(--badbg)}
-.option.wrong .letter{background:#ffdeda;color:var(--bad)}
-.option.dim{opacity:.62}
-.feedback{display:none;margin-top:18px;border-radius:14px;padding:14px 16px;line-height:1.45}
-.feedback.good{display:block;background:var(--goodbg);border:1px solid #a5dfb9;color:#11652f}
-.feedback.bad{display:block;background:var(--badbg);border:1px solid #f0b5af;color:#8e2219}
-.quiz-actions{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:20px}
-.result{display:none;padding:30px}
-.result-head{text-align:center;padding:8px 0 22px}
-.score-ring{width:130px;height:130px;margin:16px auto;border-radius:50%;display:grid;place-items:center;background:conic-gradient(#3b82f6 var(--pct),#e7ebf0 0);position:relative}
-.score-ring:before{content:"";position:absolute;width:100px;height:100px;background:#fff;border-radius:50%}
-.score-ring strong{position:relative;font-size:28px}
-.result-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:18px 0}
-.result-box{border:1px solid var(--line);border-radius:14px;padding:14px;text-align:center;background:#fafbfc}
-.result-box strong{display:block;font-size:24px}
-.review{margin-top:20px}
-.review h3{margin-bottom:10px}
-.review-item{padding:13px 0;border-top:1px solid var(--line)}
-.review-item b{display:block;margin-bottom:4px}
-.review-item span{color:var(--muted);font-size:14px}
-kbd{background:#eef1f4;border:1px solid #d4dae1;border-bottom-width:2px;border-radius:6px;padding:1px 5px;font-size:12px}
-@media(max-width:680px){
-  .grid{grid-template-columns:1fr} .header{align-items:flex-start;flex-direction:column}
-  .toolbar{grid-template-columns:1fr} .result-grid{grid-template-columns:1fr}
-  .card{padding:18px} .option{padding:13px} .setup{padding:20px}
-}
+  :root{
+    --ink:#1B2420;
+    --ink-2:#232F29;
+    --paper:#F1ECDE;
+    --paper-dim:#CFC8B2;
+    --moss:#7C9473;
+    --moss-deep:#4C6B52;
+    --gold:#E3B23C;
+    --rust:#C1594A;
+    --line: rgba(241,236,222,0.14);
+    --serif: "Iowan Old Style","Palatino Linotype","Georgia",serif;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --mono: ui-monospace, "SF Mono", "Courier New", monospace;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--ink);
+    color:var(--paper);
+    font-family:var(--sans);
+    min-height:100vh;
+    -webkit-tap-highlight-color: transparent;
+  }
+  body::before{
+    content:"";
+    position:fixed; inset:0;
+    background-image: radial-gradient(circle at 1px 1px, rgba(241,236,222,0.035) 1px, transparent 0);
+    background-size: 22px 22px;
+    pointer-events:none;
+    z-index:0;
+  }
+  .app{
+    position:relative; z-index:1;
+    max-width:640px;
+    margin:0 auto;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    padding: 0 0 40px;
+  }
+
+  /* ---------- Header / cover ---------- */
+  header.cover{
+    padding: 34px 22px 20px;
+    border-bottom: 1px solid var(--line);
+  }
+  .eyebrow{
+    font-family:var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--moss);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+  h1.title{
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: 30px;
+    line-height: 1.15;
+    margin: 10px 0 6px;
+    letter-spacing: -0.01em;
+  }
+  .subtitle{
+    color: var(--paper-dim);
+    font-size: 14px;
+    line-height:1.5;
+    max-width: 46ch;
+  }
+
+  /* ---------- Setup screen ---------- */
+  .screen{ padding: 22px; }
+  .mode-grid{
+    display:grid;
+    grid-template-columns: 1fr;
+    gap:12px;
+    margin-top: 18px;
+  }
+  .mode-card{
+    text-align:left;
+    background: var(--ink-2);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 16px 16px;
+    color: var(--paper);
+    font-family: var(--sans);
+    cursor:pointer;
+    position:relative;
+    transition: border-color .15s ease, transform .1s ease;
+  }
+  .mode-card:active{ transform: scale(0.98); }
+  .mode-card:hover{ border-color: var(--moss); }
+  .mode-card .n{
+    font-family: var(--mono);
+    font-size: 22px;
+    color: var(--gold);
+    display:block;
+    margin-bottom:4px;
+  }
+  .mode-card .label{
+    font-weight:600;
+    font-size:15px;
+    display:block;
+    margin-bottom:2px;
+  }
+  .mode-card .desc{
+    font-size:12.5px;
+    color: var(--paper-dim);
+  }
+
+  /* ---------- Quiz screen ---------- */
+  .quiz-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding: 16px 22px 0;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--moss);
+  }
+  .progress-track{
+    height: 3px;
+    background: var(--line);
+    margin: 10px 22px 0;
+    border-radius: 2px;
+    overflow:hidden;
+  }
+  .progress-fill{
+    height:100%;
+    background: var(--gold);
+    width:0%;
+    transition: width .25s ease;
+  }
+
+  .card{
+    margin: 18px 22px 0;
+    background: var(--ink-2);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 22px 20px 20px;
+    position: relative;
+  }
+  .card::before{
+    content: attr(data-num);
+    position:absolute;
+    top:-11px; left:16px;
+    background: var(--moss-deep);
+    color: var(--paper);
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 3px 9px;
+    border-radius: 3px;
+    letter-spacing: 0.05em;
+  }
+  .q-text{
+    font-family: var(--serif);
+    font-size: 19px;
+    line-height:1.42;
+    margin: 6px 0 18px;
+  }
+  .options{
+    display:flex;
+    flex-direction:column;
+    gap:9px;
+  }
+  .opt{
+    display:flex;
+    align-items:flex-start;
+    gap:11px;
+    text-align:left;
+    background: transparent;
+    border: 1px solid var(--line);
+    border-radius: 5px;
+    padding: 11px 12px;
+    color: var(--paper);
+    font-family: var(--sans);
+    font-size: 14.5px;
+    line-height:1.4;
+    cursor:pointer;
+    width:100%;
+  }
+  .opt:active{ transform: scale(0.995); }
+  .opt .letter{
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--moss);
+    border:1px solid var(--moss);
+    border-radius: 50%;
+    width:20px; height:20px;
+    min-width:20px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin-top:1px;
+  }
+  .opt.correct{
+    border-color: var(--moss);
+    background: rgba(124,148,115,0.16);
+  }
+  .opt.correct .letter{
+    background: var(--moss-deep);
+    color: var(--paper);
+    border-color: var(--moss-deep);
+  }
+  .opt.incorrect{
+    border-color: var(--rust);
+    background: rgba(193,89,74,0.14);
+  }
+  .opt.incorrect .letter{
+    background: var(--rust);
+    color: var(--paper);
+    border-color: var(--rust);
+  }
+  .opt.disabled{ cursor:default; }
+  .opt.dim{ opacity:0.45; }
+
+  .feedback{
+    margin-top:14px;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    padding: 10px 12px;
+    border-radius: 4px;
+    display:none;
+  }
+  .feedback.show{ display:block; }
+  .feedback.ok{ background: rgba(124,148,115,0.14); color: var(--moss); }
+  .feedback.bad{ background: rgba(193,89,74,0.14); color: #E3897C; }
+
+  .nav-row{
+    display:flex;
+    gap:10px;
+    margin: 16px 22px 0;
+  }
+  .btn{
+    flex:1;
+    font-family: var(--sans);
+    font-weight:600;
+    font-size: 14px;
+    padding: 13px 16px;
+    border-radius: 5px;
+    border: none;
+    cursor:pointer;
+  }
+  .btn-primary{ background: var(--gold); color: var(--ink); }
+  .btn-primary:disabled{ background: var(--paper-dim); color: var(--ink-2); opacity:0.5; cursor:not-allowed; }
+  .btn-ghost{ background: transparent; color: var(--paper-dim); border:1px solid var(--line); }
+
+  /* ---------- Results screen ---------- */
+  .results{
+    padding: 30px 22px;
+    text-align:center;
+  }
+  .stamp{
+    width: 150px; height:150px;
+    border-radius:50%;
+    border: 3px solid var(--gold);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+    margin: 10px auto 22px;
+    transform: rotate(-6deg);
+    position:relative;
+  }
+  .stamp::before{
+    content:"";
+    position:absolute; inset:8px;
+    border: 1px solid var(--gold);
+    border-radius:50%;
+    opacity:0.5;
+  }
+  .stamp .pct{
+    font-family: var(--mono);
+    font-size: 34px;
+    font-weight:700;
+    color: var(--gold);
+  }
+  .stamp .lbl{
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform:uppercase;
+    color: var(--gold);
+    margin-top:2px;
+  }
+  .results h2{
+    font-family: var(--serif);
+    font-size: 24px;
+    font-weight:500;
+    margin: 4px 0 8px;
+  }
+  .results p.summary{
+    color: var(--paper-dim);
+    font-size: 14px;
+    margin-bottom: 26px;
+  }
+  .review-list{
+    text-align:left;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    margin-bottom: 24px;
+  }
+  .review-item{
+    background: var(--ink-2);
+    border:1px solid var(--line);
+    border-radius: 5px;
+    padding: 12px 14px;
+    font-size: 13px;
+    line-height:1.4;
+  }
+  .review-item .rq{
+    font-family: var(--serif);
+    font-size: 14.5px;
+    margin-bottom:6px;
+  }
+  .review-item .ra{ font-family: var(--mono); font-size:12px; }
+  .review-item.wrong .ra.you{ color: var(--rust); }
+  .review-item .ra.right{ color: var(--moss); }
+
+  .hidden{ display:none !important; }
+
+  footer.note{
+    padding: 18px 22px 4px;
+    font-size: 11.5px;
+    color: var(--paper-dim);
+    line-height:1.5;
+    border-top: 1px solid var(--line);
+    margin-top: 30px;
+  }
 </style>
 </head>
 <body>
 <div class="app">
-  <div class="header">
-    <div class="brand">
-      <h1>Simulador Examen Complexivo</h1>
-      <p>Práctica dinámica con banco de 114 preguntas disponibles</p>
-    </div>
-    <div class="pill" id="bestPill">Mejor resultado: —</div>
-  </div>
 
-  <section class="panel setup" id="setup">
-    <h2>Configura tu práctica</h2>
-    <p>Elige cuántas preguntas quieres responder y cómo deseas practicar.</p>
-    <div class="grid">
-      <div class="field">
-        <label for="countSelect">Cantidad de preguntas</label>
-        <select id="countSelect">
-          <option value="10">10 preguntas</option>
-          <option value="20" selected>20 preguntas</option>
-          <option value="50">50 preguntas</option>
-          <option value="all">Todas las disponibles</option>
-        </select>
-        <small>Las preguntas se seleccionan al azar y no se repiten dentro de la sesión.</small>
-      </div>
-      <div class="field">
-        <label for="modeSelect">Modo de práctica</label>
-        <select id="modeSelect">
-          <option value="random">Aleatorio</option>
-          <option value="missed">Solo preguntas falladas anteriormente</option>
-          <option value="flagged">Solo preguntas marcadas para repasar</option>
-        </select>
-        <small>El historial de fallos y marcadas se guarda en este navegador.</small>
-      </div>
-      <div class="field">
-        <label for="shuffleSelect">Orden de alternativas</label>
-        <select id="shuffleSelect">
-          <option value="yes" selected>Mezclar alternativas</option>
-          <option value="no">Mantener orden original</option>
-        </select>
-        <small>La respuesta correcta se ajusta automáticamente al nuevo orden.</small>
-      </div>
-      <div class="field">
-        <label>Atajos de teclado</label>
-        <small><kbd>1</kbd>–<kbd>4</kbd> responder · <kbd>Enter</kbd> siguiente · <kbd>M</kbd> marcar para repasar.</small>
-      </div>
-    </div>
-    <div class="actions">
-      <button class="btn primary" id="startBtn">Comenzar práctica</button>
-      <button class="btn secondary" id="clearHistoryBtn">Borrar historial</button>
-    </div>
-    <div id="setupMsg" style="margin-top:12px;color:var(--bad);font-size:14px"></div>
+  <header class="cover">
+    <div class="eyebrow"><span>Posgrado UNEMI</span><span id="clock-badge">Ficha de repaso</span></div>
+    <h1 class="title">Simulador — Examen Complexivo</h1>
+    <div class="subtitle">114 preguntas del banco actualizado, listas para repasar desde el celular. Elige un modo para empezar.</div>
+  </header>
+
+  <!-- SETUP SCREEN -->
+  <section id="screen-setup" class="screen">
+    <div class="mode-grid" id="mode-grid"></div>
   </section>
 
-  <section class="panel quiz" id="quiz">
-    <div class="toolbar">
-      <div class="stats">
-        <div class="stat">Pregunta <strong id="posText">1/20</strong></div>
-        <div class="stat">Correctas <strong id="correctText">0</strong></div>
-        <div class="stat">Incorrectas <strong id="wrongText">0</strong></div>
-        <div class="stat timer">Tiempo <strong id="timerText">00:00</strong></div>
-      </div>
-      <button class="btn ghost" id="exitBtn">Salir</button>
+  <!-- QUIZ SCREEN -->
+  <section id="screen-quiz" class="hidden">
+    <div class="quiz-header">
+      <span id="q-position">Pregunta 1 / 20</span>
+      <span id="q-score">Aciertos: 0</span>
     </div>
-    <div class="progress-wrap"><div class="progress" id="progress"></div></div>
-    <div class="card">
-      <div class="meta">
-        <span id="qLabel">Pregunta</span>
-        <button class="btn ghost" id="flagBtn" style="min-height:auto;padding:7px 10px">Marcar para repasar</button>
-      </div>
-      <h2 class="question" id="questionText"></h2>
-      <div class="options" id="options"></div>
-      <div class="feedback" id="feedback" aria-live="polite"></div>
-      <div class="quiz-actions">
-        <button class="btn secondary" id="restartBtn">Reiniciar sesión</button>
-        <button class="btn blue" id="nextBtn" disabled>Siguiente</button>
-      </div>
+    <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+
+    <div class="card" id="q-card" data-num="Ficha 001">
+      <div class="q-text" id="q-text"></div>
+      <div class="options" id="q-options"></div>
+      <div class="feedback" id="q-feedback"></div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-ghost" id="btn-quit">Salir</button>
+      <button class="btn btn-primary" id="btn-next" disabled>Siguiente</button>
     </div>
   </section>
 
-  <section class="panel result" id="result">
-    <div class="result-head">
-      <div style="color:var(--muted);font-weight:700">Resultado final</div>
-      <div class="score-ring" id="scoreRing"><strong id="pctText">0%</strong></div>
-      <h2 id="resultTitle" style="margin:0">Sesión finalizada</h2>
-      <p id="resultSub" style="color:var(--muted)"></p>
+  <!-- RESULTS SCREEN -->
+  <section id="screen-results" class="hidden results">
+    <div class="stamp">
+      <span class="pct" id="res-pct">0%</span>
+      <span class="lbl" id="res-lbl">Resultado</span>
     </div>
-    <div class="result-grid">
-      <div class="result-box"><span>Correctas</span><strong id="rCorrect">0</strong></div>
-      <div class="result-box"><span>Incorrectas</span><strong id="rWrong">0</strong></div>
-      <div class="result-box"><span>Tiempo</span><strong id="rTime">00:00</strong></div>
-    </div>
-    <div class="actions" style="justify-content:center">
-      <button class="btn primary" id="againBtn">Nueva práctica</button>
-      <button class="btn secondary" id="retryWrongBtn">Repasar falladas</button>
-    </div>
-    <div class="review" id="review"></div>
+    <h2 id="res-title">Ronda completa</h2>
+    <p class="summary" id="res-summary"></p>
+    <div class="review-list" id="review-list"></div>
+    <button class="btn btn-primary" id="btn-restart" style="width:100%;">Repasar de nuevo</button>
   </section>
+
+  <footer class="note">Simulador de estudio no oficial, generado a partir del banco de preguntas compartido. 2 preguntas del banco original (sin respuesta única confirmada) fueron excluidas de esta ficha.</footer>
 </div>
 
+<script id="questions-data" type="application/json">[{"q": "Son aquellos que disminuyen la probabilidad de caer en un comportamiento de riesgo:", "options": {"A": "Los factores emocionales", "B": "Los factores familiares", "C": "Los factores de riesgo", "D": "Los factores protectores"}, "correct": "D"}, {"q": "Los juegos tales como saltar la cuerda, el avioncito, jugar con el aro, son un excelente ejemplo de juegos que estimulan:", "options": {"A": "Motricidad.", "B": "Cognición.", "C": "Sensibilidad.", "D": "Sensorial."}, "correct": "A"}, {"q": "¿De los elementos a considerar para evaluar la calidad de la información que se encuentra en internet, qué describe la relevancia?", "options": {"A": "Describe la función de la veracidad de los datos, proporciones y porcentajes que contiene la publicación", "B": "Describe el nivel de importancia que no tiene la información encontrada con respecto al trabajo que se está realizando", "C": "Describe el nivel de importancia que tiene la información encontrada con respecto al trabajo que se está realizando", "D": "Describe la función desde los datos, proporciones y porcentajes que contiene la metodología"}, "correct": "C"}, {"q": "Acciones determinantes del habla, coordinando las diferentes estructuras orales:", "options": {"A": "Herramientas psicológicas", "B": "Praxias buco fonatorias", "C": "Mediación", "D": "Funciones mentales"}, "correct": "B"}, {"q": "Es el proceso mediante el cual los miembros de la familia establecen una sensación de continuidad, identidad y estabilidad.", "options": {"A": "La retroalimentación", "B": "La circularidad", "C": "La equifinalidad", "D": "La permeabilidad familiar"}, "correct": "B"}, {"q": "¿De los elementos a considerar para evaluar la calidad de la información que se encuentra en internet, qué mide la confiabilidad?", "options": {"A": "Trata de medir la reputación del sitio web en el que se ha publicado la información", "B": "Trata de medir la estructura del sitio web en el que se ha publicado la información", "C": "Trata de medir la redacción del sitio web en el que se ha publicado la información", "D": "Trata de medir la creatividad del sitio web en el que se ha publicado la información"}, "correct": "A"}, {"q": "Características exclusivas de los seres humanos:", "options": {"A": "Sensación y percepción.", "B": "Cultura y lenguaje.", "C": "Comprensión.", "D": "Imaginación y memoria."}, "correct": "B"}, {"q": "¿Es una aplicación que permite a las personas realizar reuniones y comunicarse en tiempo real a través de video, audio y chat en línea?", "options": {"A": "Google Meet", "B": "Marqueed", "C": "Symbaloo", "D": "Voxopop"}, "correct": "A"}, {"q": "¿Qué es dominio web?", "options": {"A": "El nombre del sitio web que no se muestra en la barra de herramientas.", "B": "El sitio web que se muestra en la barra de favoritos.", "C": "El nombre del sitio web que se muestra en la barra de herramientas.", "D": "El lugar del sitio web que se muestra en la barra de navegación."}, "correct": "C"}, {"q": "Praxias que se constituyen como objetivos del logopeda:", "options": {"A": "Praxias linguales.", "B": "Praxias del velo del paladar.", "C": "Todas las anteriores.", "D": "Praxias labiales."}, "correct": "C"}, {"q": "¿Cómo absorbe el niño su entorno según la metodología Montessori?", "options": {"A": "A través de los sentidos.", "B": "No absorbe su entorno.", "C": "Únicamente a través del intelecto.", "D": "A través del desarrollo de habilidades motoras."}, "correct": "A"}, {"q": "Se recomienda que el docente evite liderar el juego en los rincones, y lo realice únicamente cuando sea necesario y por un mínimo tiempo. ¿En qué edad?", "options": {"A": "Mayores de dos años.", "B": "6 años.", "C": "Mayores de 8 años.", "D": "1 año."}, "correct": "A"}, {"q": "Seleccione la opción que defina mejor la conceptualización de Educación Inclusiva.", "options": {"A": "Supone un modelo de educación que pretende atender a las necesidades de todos los niños y niñas.", "B": "Modelo para clasificar a la comunidad", "C": "Mecanismo que sirve para asegurar la defensa de los derechos de todos los niños y niñas.", "D": "Estrategias para atender únicamente a los niños regulares"}, "correct": "A"}, {"q": "La Neurociencia se constituye como una disciplina científica que estudia los distintos componentes del ____________, siendo uno de ellos ______________.", "options": {"A": "Sistema endócrino – los riñones", "B": "Sistema locomotor – los huesos", "C": "Sistema respiratorio – los pulmones", "D": "Sistema nervioso – el cerebro"}, "correct": "D"}, {"q": "¿A qué se refiere la funcionalidad familiar?", "options": {"A": "A la capacidad de una familia para funcionar de manera saludable, armoniosa y satisfactoria.", "B": "A la capacidad de adaptación y cambio dentro de la familia.", "C": "Al enfoque sistémico para comprender la dinámica familiar.", "D": "A la unión emocional y falta de compromiso entre los miembros de la familia."}, "correct": "A"}, {"q": "Existe una serie de autores cuya idea principal es considerar que los juegos se clasifican en función al desarrollo de las cualidades motrices del niño o a los objetivos motores que el docente desea que sus alumnos alcancen. Este postulado hace referencia a:", "options": {"A": "Clasificación de Tipos de Teorías motrices.", "B": "Tipos de pensamientos psicomotores.", "C": "Clasificación de los Juegos Motores.", "D": "Diferencia entre las habilidades motrices."}, "correct": "C"}, {"q": "¿En qué ambientes el niño se forma ideas y conductas relacionadas con la competencia social?", "options": {"A": "Hogar y parque.", "B": "Escuela y hogar.", "C": "Museo y parque.", "D": "Casa de un compañero."}, "correct": "B"}, {"q": "¿A qué capacidades favorece la educación emocional?", "options": {"A": "Comunicativas y relaciones interpersonales.", "B": "Razonamiento lógico matemático.", "C": "Relaciones interpersonales.", "D": "Comunicativas."}, "correct": "A"}, {"q": "¿En qué consiste la teoría de las inteligencias múltiples?", "options": {"A": "Refiere al aprendizaje en niños con NEE.", "B": "Postula el estudio de las capacidades del multiaprendizaje.", "C": "Menciona el uso de las tecnologías para un aprendizaje integral.", "D": "Se enfoca en el desarrollo cognitivo conductual."}, "correct": "B"}, {"q": "¿A qué se refiere el Mindfulness?", "options": {"A": "Prestar atención detenida a los recuerdos más profundos.", "B": "Interpretar situaciones momentáneas para emitir ideas de intervención a los recuerdos del pasado.", "C": "A la conciencia de adaptarse a situaciones incómodas.", "D": "A la conciencia plena que aparece al prestar atención deliberadamente en el momento presente y libre de juicios."}, "correct": "D"}, {"q": "La teoría de la mente es la capacidad humana para atribuir pensamientos e intenciones a otras personas. ¿Cuáles son características de su desarrollo?", "options": {"A": "Se empieza a desarrollar sobre los 3 y 5 años; comprender que cada persona piensa, percibe y siente cosas diferentes; y es crucial para el desarrollo socioemocional.", "B": "Fomenta únicamente el pensamiento egocéntrico.", "C": "Se desarrolla exclusivamente en la adultez.", "D": "Ninguna de las anteriores."}, "correct": "A"}, {"q": "Es importante señalar que ______ no veía el desarrollo intelectual de los niños como un proceso cuantitativo.", "options": {"A": "Piaget.", "B": "Chomsky.", "C": "Platón.", "D": "Kohlberg."}, "correct": "A"}, {"q": "Designa la adquisición de habilidades que se observa en el niño de forma continua durante toda la infancia.", "options": {"A": "El ejercicio psicomotor.", "B": "El desarrollo psicomotor.", "C": "El equilibrio psicomotor.", "D": "Proceso socioafectivo del área motora."}, "correct": "B"}, {"q": "Bruner en las teorías del lenguaje menciona que los niños aprenden usando formas:", "options": {"A": "Psicológicas.", "B": "Expresivas.", "C": "Abstractas.", "D": "Comunicativas."}, "correct": "D"}, {"q": "¿Cuáles son las fases de la autorregulación?", "options": {"A": "Planificación y autorreflexión.", "B": "Planificación, ejecución y autorreflexión.", "C": "Planificación y ejecución.", "D": "Planificación, ejecución y reflexión."}, "correct": "B"}, {"q": "Al nacer un niño, sus movimientos son:", "options": {"A": "Precisos.", "B": "Expresivos.", "C": "Involuntarios e inconscientes.", "D": "Voluntarios e inconscientes."}, "correct": "C"}, {"q": "Son características de la educación socio afectiva, excepto:", "options": {"A": "Ayuda a tener un buen autocontrol.", "B": "Se relaciona con el manejo de las emociones.", "C": "Potencia el desarrollo cognitivo.", "D": "Ayuda a tener una buena autoestima."}, "correct": "C"}, {"q": "La capacidad para ______ es fundamental en el juego simbólico, ya que permite a los niños representar situaciones imaginarias y experimentar diferentes roles.", "options": {"A": "Imitar.", "B": "Explorar.", "C": "Construir.", "D": "Coordinar."}, "correct": "A"}, {"q": "¿Es una herramienta que forma parte del Google Workspace, permite crear presentaciones electrónicas dinámicas y en entorno web?", "options": {"A": "Eduflow.", "B": "Educflow.", "C": "Google Slides.", "D": "Google Form."}, "correct": "C"}, {"q": "Seleccione las opciones que constituyen el circuito cerebral de lectura:", "options": {"A": "Área de Broca, corteza visual y lóbulos frontales.", "B": "Corteza visual y médula espinal.", "C": "Médula espinal y lóbulos frontales.", "D": "Únicamente el área de Broca."}, "correct": "A"}, {"q": "¿Cómo se llama el proceso en el que el cerebro humano interpreta las sensaciones que recibe a través de los sentidos para formar una impresión consciente o inconsciente?", "options": {"A": "Atención.", "B": "Percepción.", "C": "Sensación.", "D": "Memoria."}, "correct": "B"}, {"q": "En la infancia, los niños experimentan una gama de emociones. El rol de la cuento-terapia en este proceso consiste en:", "options": {"A": "Narrar un cuento.", "B": "Leer un cuento.", "C": "Expresar un cuento.", "D": "Entender y expresar sus emociones."}, "correct": "D"}, {"q": "Beneficios de incorporar la lúdica como metodología de enseñanza en las aulas:", "options": {"A": "Logros bajos de aprendizaje, confianza en sí mismo, alta motivación infantil.", "B": "Logros altos de aprendizaje, confianza en sí mismo, alta motivación infantil.", "C": "Logros altos de aprendizaje, poca confianza en sí mismo, alta motivación infantil.", "D": "Ninguna de las anteriores."}, "correct": "B"}, {"q": "¿Cuál es la función del neurotransmisor noradrenalina?", "options": {"A": "Modula la conducta social y las emociones.", "B": "Controla los movimientos voluntarios del cuerpo.", "C": "Regula las respuestas involuntarias.", "D": "Controla el enfoque mental y la atención."}, "correct": "D"}, {"q": "Es la implicación de la familia en la toma de decisiones y en las responsabilidades relacionadas con el mantenimiento familiar. ¿De qué componente del APGAR familiar estamos hablando?", "options": {"A": "Participación.", "B": "Adaptación.", "C": "Gradiente de recursos.", "D": "Capacidad resolutiva."}, "correct": "A"}, {"q": "¿Cómo podría beneficiar a un niño el fomentar sus habilidades interculturales y competencias emocionales en su infancia?", "options": {"A": "Interactuar de manera efectiva y respetuosa con personas de diferentes culturas.", "B": "Contribuye al aprendizaje de varios idiomas.", "C": "Bajo nivel de aprendizaje.", "D": "Mejora solo el razonamiento lógico."}, "correct": "A"}, {"q": "¿En qué periodo de la infancia se desarrollan juegos que requieren coordinación y habilidades motoras más complejas, como los deportes o juegos de equipo?", "options": {"A": "Etapa de juegos sensoriomotores.", "B": "Etapa de juegos de reglas.", "C": "Etapa de juegos de construcción.", "D": "Etapa de juegos simbólicos."}, "correct": "B"}, {"q": "Este modelo tiene como características orientar y aconsejar a las personas en cuanto a la toma de decisiones. ¿A qué modelo nos referimos?", "options": {"A": "Modelo de consejo.", "B": "Modelo de intervención.", "C": "Modelo de programas.", "D": "Modelo familiar."}, "correct": "A"}, {"q": "Durante el proceso de producción y gestión de contenidos educativos digitales, es importante considerar:", "options": {"A": "La disponibilidad de recursos tecnológicos con los que no cuentan nuestros estudiantes.", "B": "La no disponibilidad de recursos tecnológicos con los que cuentan nuestros estudiantes.", "C": "La asignación de recursos no tecnológicos con los que cuentan nuestros estudiantes.", "D": "La disponibilidad de recursos tecnológicos con los que cuentan nuestros estudiantes y conocer qué tipo de dispositivo electrónico utilizan como herramienta de estudio en internet."}, "correct": "D"}, {"q": "Tanto el encéfalo como la médula espinal están protegidos por huesos: el encéfalo, por los ____________, y la médula espinal, por una serie de huesos entrelazados en forma de anillo, llamados ____________.", "options": {"A": "Huesos del esternón – costillas.", "B": "Huesos del coxis – falanges.", "C": "Huesos de la rótula – metatarsos.", "D": "Huesos del cráneo – vértebras."}, "correct": "D"}, {"q": "Completa el siguiente enunciado con la opción correcta: La Convención sobre los Derechos del Niño (1989), establece el ________ de los niños a la ___________ de su identidad cultural, incluyendo su lengua y sus tradiciones.", "options": {"A": "Derecho – preservación", "B": "Juego – visión", "C": "Derecho – visión", "D": "Pensamiento – necesidad"}, "correct": "A"}, {"q": "Seleccione cuáles de las siguientes son funciones cognitivas superiores.", "options": {"A": "Lenguaje", "B": "Pensamiento", "C": "Atención", "D": "Razonamiento"}, "correct": "B"}, {"q": "Son pilares de la educación, excepto:", "options": {"A": "Aprender a hacer.", "B": "Aprender a saber.", "C": "Aprender a vivir juntos.", "D": "Aprender a existir."}, "correct": "D"}, {"q": "Son movimientos pequeños de la motricidad fina, excepto:", "options": {"A": "Cortar con tijera.", "B": "Realizar nudos.", "C": "Rasgar.", "D": "Jugar con una pelota."}, "correct": "D"}, {"q": "¿A qué contribuye el reconocer y valorar la diversidad cultural y étnica de los países?", "options": {"A": "A enriquecer la sociedad y promover la igualdad", "B": "A mejorar el aprendizaje de los docentes", "C": "A enriquecer a las empresas", "D": "Al aumento en el producto interno bruto"}, "correct": "A"}, {"q": "Completa el siguiente enunciado con las opciones correctas: La participación ciudadana apoya la implantación de los ____________ de ___________ y honestidad y la disminución de la discrecionalidad de las autoridades y funcionarios.", "options": {"A": "Recursos – Transparencia.", "B": "Principios – Transparencia.", "C": "Discursos – transparencia.", "D": "Principios – Arbitrariedad."}, "correct": "B"}, {"q": "Se producen en el organismo una inmensa cantidad de reflejos condicionados de diferentes orígenes, que surgen como resultado de la acción de estímulos complejos y combinaciones, los cuales constituyen la base del desarrollo:", "options": {"A": "Social.", "B": "Motriz.", "C": "Cognitivo.", "D": "Sensorial."}, "correct": "C"}, {"q": "Conceptos relacionados con el Sistema Familiar:", "options": {"A": "La permeabilidad familiar - La circularidad - La retroalimentación - La equifinalidad.", "B": "El mesosistema - El exosistema - El macrosistema.", "C": "La permeabilidad familiar - El exosistema - Niveles de intervención.", "D": "Estilo autoritario - La orientación familiar - Niveles de intervención - La circularidad."}, "correct": "A"}, {"q": "¿Qué se entiende por la empatía en la infancia?", "options": {"A": "La capacidad de los niños para resolver conflictos de manera pacífica.", "B": "La capacidad de los niños para aprender.", "C": "La capacidad de los niños para mejorar su autoestima.", "D": "La capacidad de los niños para comprender y compartir los sentimientos de los demás."}, "correct": "D"}, {"q": "¿En qué consiste la inteligencia espacial?", "options": {"A": "Los niños aprenden viendo el lenguaje, expresándolo y utilizándolo.", "B": "Los niños aprenden observando e interactuando con plantas y animales.", "C": "Los niños aprenden visualizando con los ojos de la mente y traduciendo lo que ven en alguna forma tangible.", "D": "Los niños aprenden buscando patrones y relaciones entre objetos y hechos."}, "correct": "C"}, {"q": "¿Qué es el desarrollo psicomotor?", "options": {"A": "Es aquel que sigue un ritmo marcado, en el que los diferentes progresos correspondientes a cada edad quedan encadenados. Una vez que se adquiere una habilidad motriz, ésta se perfecciona y posteriormente se aprende una nueva.", "B": "Desarrollo de resistencia propioceptiva.", "C": "Aquel que sigue un andamiaje marcado, en el que los diferentes progresos correspondientes a cada edad quedan encadenados. Una vez que se adquiere una emoción ésta se perfecciona y posteriormente se aprende una nueva.", "D": "Es el proceso de adquisición de estructuras cognitivas y socioafectivas."}, "correct": "A"}, {"q": "¿A qué se refiere la permeabilidad familiar?", "options": {"A": "Se refiere a un conjunto de funciones que se ejecutan de forma consciente o inconsciente entre los integrantes de una familia.", "B": "Se refiere a cómo la familia se relaciona con otros sistemas.", "C": "Se refiere al comportamiento social con la familia y entorno.", "D": "Se refiere al proceso mediante el cual los miembros de la familia establecen una sensación de continuidad, identidad y estabilidad."}, "correct": "B"}, {"q": "¿Cómo describe Montessori la capacidad de aprendizaje de los niños en sus primeros años?", "options": {"A": "Limitada y predecible.", "B": "Frágil y reversible.", "C": "Aleatoria y discontinua.", "D": "Ilimitada y continua."}, "correct": "D"}, {"q": "De las características de los recursos digitales educativos, ¿qué sería la interactividad?", "options": {"A": "Es un concepto tecnológico que no facilita el acceso a archivos, recursos, aplicaciones, sistemas y demás elementos que se encuentran almacenados en algún servidor de internet.", "B": "El diseño de recursos interactivos que proporcionan una base para una experiencia de aprendizaje más atractiva.", "C": "Son elementos clave que añaden una dimensión multisensorial a la información exponiéndola con mayor riqueza de matices.", "D": "El diseño de recursos interactivos que proporcionan una base para una experiencia de aprendizaje más compleja."}, "correct": "B"}, {"q": "¿Qué se entiende por competencias emocionales en la infancia?", "options": {"A": "La capacidad de los niños para mejorar su rendimiento.", "B": "La capacidad de los niños para reconocer y regular sus emociones.", "C": "La capacidad de los niños para interactuar con personas de diferentes culturas.", "D": "La capacidad de los niños para aprender varios idiomas."}, "correct": "B"}, {"q": "¿Qué promueve el programa de Educación Inicial y Desarrollo Infantil “Buen Vivir”?", "options": {"A": "Prioriza el acceso universal y equitativo a la educación inicial.", "B": "Limita la participación activa de las familias en el proceso educativo.", "C": "Promueve un enfoque inclusivo, intercultural y de género.", "D": "Fomenta exclusivamente el desarrollo motor de los niños."}, "correct": "C"}, {"q": "¿Qué aspecto se destaca en relación con el niño o la niña en la metodología Montessori?", "options": {"A": "Su libertad y autonomía para jugar y aprender.", "B": "Su capacidad de aprender a un ritmo preestablecido.", "C": "Su falta de interés en el entorno natural.", "D": "Su dependencia total de la guía de los adultos."}, "correct": "A"}, {"q": "¿Cómo es conocido el proceso por el cual el niño o niña identifica emociones y sentimientos, a la vez que aprende a manejarlos adecuadamente?", "options": {"A": "Desarrollo motor fino", "B": "Desarrollo afectivo", "C": "Desarrollo motor grueso", "D": "Desarrollo cognitivo"}, "correct": "B"}, {"q": "¿Cómo se refiere la Dra. Montessori a los entornos de aprendizaje?", "options": {"A": "Como elementos irrelevantes para el proceso educativo.", "B": "Como obstáculos para el aprendizaje.", "C": "Como elementos secundarios en la educación.", "D": "Como el medio que rodea al estudiante y el material didáctico utilizado."}, "correct": "D"}, {"q": "¿A qué edad el niño tendrá un repertorio básico lingüístico?", "options": {"A": "De los 2 a 6 años", "B": "De 1 a 2 años", "C": "De 1 a 3 años", "D": "De los 6 a 9 años"}, "correct": "A"}, {"q": "Son habilidades cognitivas, excepto:", "options": {"A": "Concentración", "B": "Memoria", "C": "Esquema corporal", "D": "Atención"}, "correct": "C"}, {"q": "¿Qué significa la inclusividad en el contexto escolar?", "options": {"A": "Ignorar las necesidades individuales de los estudiantes.", "B": "Asegurar que todos los estudiantes tengan acceso a la educación de calidad.", "C": "Permitir que solo algunos estudiantes participen en actividades extracurriculares.", "D": "Limitar el acceso a la educación solo a ciertos grupos de estudiantes."}, "correct": "B"}, {"q": "¿Cuáles son las consideraciones de la crianza positiva para el desarrollo de un niño?", "options": {"A": "Educar con premios y castigos.", "B": "El respeto a los hijos, criar con amor y sobre todo, realizar sin el uso de la violencia.", "C": "El respeto a los hijos, a partir de acuerdos y premios de recompensa.", "D": "Criar mediante el establecimiento de reglas poco flexibles."}, "correct": "B"}, {"q": "¿De los elementos a considerar para evaluar la calidad de la información que se encuentra en internet, en qué se valora la exactitud?", "options": {"A": "Se valora el nivel de importancia que tiene la información encontrada con respecto al trabajo que se está realizando", "B": "Se valora en función de la veracidad de los datos, proporciones y porcentajes que contiene la publicación", "C": "Se valora el nivel de importancia que no tiene la información encontrada con respecto al trabajo que no se está realizando", "D": "Se valora la función de la veracidad de los datos, proporciones y porcentajes que no contiene la publicación"}, "correct": "B"}, {"q": "Estructura Familiar: Se define como un conjunto de funciones que se ejecutan de forma consciente o inconsciente entre los integrantes de una familia, y se modifican a partir de:", "options": {"A": "las habilidades intelectuales", "B": "las reglas y límites", "C": "las necesidades o las expectativas", "D": "la negociación de reglas y criterios"}, "correct": "C"}, {"q": "¿A los cuántos meses un bebé logra interpretar las expresiones faciales, entre otras acciones propias de la primera infancia?", "options": {"A": "De 6 a 7 meses", "B": "De 8 a 10 meses", "C": "De 12 a 24 meses", "D": "De 4 a 5 meses"}, "correct": "B"}, {"q": "¿A qué contribuyen los alimentos reguladores?", "options": {"A": "A la formación de los huesos.", "B": "A los procesos metabólicos del cuerpo.", "C": "Al proceso celular correcto.", "D": "Al crecimiento de todos los órganos del cuerpo."}, "correct": "B"}, {"q": "¿En qué se basan principalmente las herramientas de la Web 2.0?", "options": {"A": "En la versatilidad de tienen los sitios web y el gran potencial educativo que pueden llegar a tener.", "B": "En herramientas que no potencian la comunicación, la interacción, el consumo, la producción y la coproducción de recursos, contenidos y materiales.", "C": "Conexión continua, segura, de buena calidad y estabilidad para garantizar el acceso a los recursos y la interacción entre los participantes.", "D": "En un importante componente social, en este sentido estas herramientas potencian la comunicación, la interacción, el consumo, la producción y la coproducción de recursos, contenidos y materiales."}, "correct": "D"}, {"q": "Capacidad de utilizar recursos intra y extra familiares para resolver problemas en situaciones de estrés familiar o periodos de crisis. ¿De qué componente del APGAR familiar estamos hablando?", "options": {"A": "Participación", "B": "Adaptación", "C": "Capacidad resolutiva", "D": "Gradiente de recursos"}, "correct": "B"}, {"q": "Seleccione cuáles de las siguientes son funciones cognitivas básicas.", "options": {"A": "Percepción", "B": "Capacidad abstracta", "C": "Atención", "D": "Memoria"}, "correct": "D"}, {"q": "Seleccione qué cambios puede producir la práctica de Mindfulness.", "options": {"A": "Fortalece la atención", "B": "Incrementa el potencial del cerebro", "C": "Desregulación emocional", "D": "Potencia la producción de anticuerpos"}, "correct": "B"}, {"q": "Período comprendido entre los 0 y los 12 meses en el cual el niño emite ruidos y se hace sensible a ellos y no usa palabras:", "options": {"A": "Etapa de combinación", "B": "Etapa holofrástica", "C": "Etapa lingüística", "D": "Etapa prelingüística"}, "correct": "D"}, {"q": "¿Es una metodología de enseñanza centrada en el estudiante, el cual construye su conocimiento mediante la ejecución de proyectos o actividades prácticas significativas?", "options": {"A": "Aprendizaje Basado en Contenido", "B": "Aprendizaje Basado en Exámenes", "C": "Aprendizaje Basado en Proyectos", "D": "Aprendizaje Basado en Memorización"}, "correct": "C"}, {"q": "Basados en la teoría del cerebro triuno de Paul MacLean, seleccione la opción que contenga las características del cerebro reptiliano. A) Con muy poco o ningún proceso sentimental. B) Pensamiento instintivo. C) Asegura la supervivencia. D) Almacena la memoria.", "options": {"A": "A-B-C", "B": "B-D-A", "C": "A-C-D", "D": "B-C-D"}, "correct": "A"}, {"q": "Período en el cual el niño empieza a construir sus primeras oraciones con sujeto y predicado y aprende a realizar las entonaciones de las oraciones interrogativas.", "options": {"A": "Entre los 0 y los 12 meses", "B": "De los 12 a los 24 meses", "C": "Entre los dos y los tres años", "D": "Hacia los 12 meses"}, "correct": "C"}, {"q": "¿Qué beneficio se destaca del aprendizaje por descubrimiento en comparación con el aprendizaje tradicional?", "options": {"A": "No promueve la reflexión ni la hipótesis.", "B": "No estimula la creatividad.", "C": "Potencia la solución creativa de problemas.", "D": "Limita la autonomía del estudiante."}, "correct": "C"}, {"q": "¿Cuál es el papel de las escuelas en relación con la formación ciudadana y la convivencia democrática?", "options": {"A": "Mantener un espíritu de uniformidad que inhibe la diversidad de opiniones.", "B": "Contribuir a la formación de ciudadanos críticos y activos en una sociedad democrática.", "C": "Facilitar la reproducción de las estructuras sociales existentes.", "D": "Restringir el acceso a saberes y discursos que fomenten la participación ciudadana."}, "correct": "B"}, {"q": "La etapa del bebé entre los ______ consiste en jugar con los objetos, manipulándolos y explorándolos sensorialmente (sonajeros, mordedores, muñecos de diferentes texturas).", "options": {"A": "4 – 8 días", "B": "4 – 8 años", "C": "Ninguna de las anteriores", "D": "4 – 8 meses."}, "correct": "D"}, {"q": "¿Qué tipo de juego permite a los niños explorar sus emociones y experimentar diferentes roles en un entorno seguro?", "options": {"A": "Juego simbólico", "B": "Juego de construcción", "C": "Juego de reglas", "D": "Juego sensoriomotor"}, "correct": "A"}, {"q": "¿En qué consiste el panel de la emoción?", "options": {"A": "Es un recurso interesante para enseñar a los estudiantes a poner en palabras las emociones que sienten", "B": "Consiste en intercambiar abrazos durante un tiempo de cinco minutos aproximadamente.", "C": "Consiste en una rutina de pensamiento que favorece al desarrollo de habilidades cognitivas", "D": "Es un recurso que permite relajar el cuerpo y entrar en estado de paz."}, "correct": "A"}, {"q": "¿Cuál es el sistema social que representa entornos y situaciones donde no se tiene un contacto directo, pero que acaban influyendo? Por ejemplo: el niño no forma parte de los consejos ciudadanos, pero las políticas que establezcan influyen en su familia, su educación y experiencias recreativas.", "options": {"A": "Mesosistema", "B": "Exosistema", "C": "Macrosistema", "D": "Microsistema"}, "correct": "B"}, {"q": "¿Cuáles de las siguientes afirmaciones describe un beneficio del mapeo y diagnóstico participativo?", "options": {"A": "Permite recopilar información cualitativa y cuantitativa sobre el entorno y las necesidades de la comunidad.", "B": "Limita la participación activa de los niños en la identificación de recursos.", "C": "Facilita la identificación de lugares importantes en el entorno de los niños.", "D": "Fomenta el desarrollo de la comunidad."}, "correct": "B"}, {"q": "Las conexiones neuronales son recubiertas por una sustancia vital, evitando que los aprendizajes se pierdan. ¿Cuál es el nombre de este proceso?", "options": {"A": "Mielinización", "B": "Refinamiento neuronal", "C": "Poda neuronal", "D": "Proliferación neuronal"}, "correct": "A"}, {"q": "¿Es una herramienta dinámica que permite crear contenido digital de manera individual o colaborativa? Presentaciones, infografías, imágenes interactivas, entre otras.", "options": {"A": "Genially", "B": "Jenially", "C": "Eduflow", "D": "Educflow"}, "correct": "A"}, {"q": "Es importante identificar los procesos o dinámicas que utilizan las familias para llegar a soluciones, con el fin de determinar:", "options": {"A": "Comunicación", "B": "Funcionamiento emocional", "C": "Estructura familiar", "D": "Patrones de interacción"}, "correct": "D"}, {"q": "¿Qué es el juego sensoriomotor?", "options": {"A": "Es un tipo de juego que consiste en la construcción a partir de materiales.", "B": "Es un tipo de juego que involucra cumplimiento de reglas.", "C": "Es un tipo de juego característico de los adolescentes de 12 años.", "D": "Es un tipo de juego que consiste, principalmente, en la repetición de ciertas acciones con el fin de obtener un resultado inmediato y placentero."}, "correct": "D"}, {"q": "¿A los cuántos meses, un bebé logra asociar el significado emocional con las expresiones faciales?", "options": {"A": "A los 24 meses", "B": "A los 3 meses", "C": "A los 8 a los 12 meses", "D": "A los 4 a 7 meses"}, "correct": "C"}, {"q": "¿Qué ocurre en el bebé entre el segundo y cuarto mes?", "options": {"A": "Nos encontramos con un tipo de conducta denominada reacción circular primaria. El bebé obtiene un resultado placentero que le invita a repetir esas acciones una y otra vez.", "B": "Nos encontramos con un tipo de conducta denominada asimilación circular primaria. El bebé obtiene un resultado desagradable que le invita a repetir esas acciones una y otra vez.", "C": "Nos encontramos con un tipo de conducta denominada acomodación circular secundaria. El bebé obtiene un resultado desagradable que le invita a repetir esas acciones una y otra vez.", "D": "Todas las anteriores."}, "correct": "A"}, {"q": "¿A qué se refiere la inteligencia interpersonal?", "options": {"A": "Los niños aprenden relacionándose con otros y colaborando.", "B": "Capacidad de reconocer los propios sentimientos y emociones.", "C": "Los niños aprenden buscando patrones entre objetos y hechos", "D": "Los niños aprenden a través del tacto y del movimiento"}, "correct": "A"}, {"q": "Según Hoffman (2018), ¿qué implica la circularidad?", "options": {"A": "Implica la interacción de los miembros de la familia.", "B": "Implica las reglas y límites entre los miembros de la familia.", "C": "Implica la relación con otros sistemas.", "D": "Implica la negociación de reglas, acuerdos, responsabilidades."}, "correct": "A"}, {"q": "Tipo de praxia que se relaciona con los movimientos de los labios dirigidos sobre todo para la articulación de los fonemas:", "options": {"A": "Praxias del velo del paladar", "B": "Praxias labiales", "C": "Praxias de mandíbula", "D": "Praxias linguales"}, "correct": "B"}, {"q": "¿De qué dependerá el éxito de la migración de la escuela a entornos digitales?", "options": {"A": "De la capacidad que tengan los estudiantes para no convertirse en entes transformadores, críticos y participativos de esta iniciativa digital", "B": "De la capacidad que tengan los profesores para convertirse en entes transformadores, críticos y participativos de esta iniciativa digital", "C": "De la capacidad que tengan los profesores para no convertirse en entes transformadores, críticos y participativos de esta iniciativa digital", "D": "De la capacidad que tengan los estudiantes para convertirse en entes transformadores, críticos y participativos de esta iniciativa digital"}, "correct": "B"}, {"q": "¿Cuál es el objetivo de implementar mecanismos de participación como consejos estudiantiles, asambleas escolares y mesas de diálogo con niños, niñas y adolescentes?", "options": {"A": "La construcción de espacios de recreación", "B": "La construcción de edificios adaptados a personas con discapacidad", "C": "El desarrollo de políticas públicas que los beneficien", "D": "El desarrollo de sus habilidades sociales"}, "correct": "C"}, {"q": "La neurona es la unidad básica del sistema nervioso central ¿Cuál es su función principal?", "options": {"A": "Procesar alimentos para descomponerlos en sustancias.", "B": "Llevar oxígeno del aire a la sangre.", "C": "Metabolismo y reproducción.", "D": "Transmitir información a través de impulsos nerviosos."}, "correct": "D"}, {"q": "¿A qué tipo de juegos se refiere la frase: “En el juego de construcción de casitas de muñecas y de construir con cubos también se observan juegos simbólicos donde el niño transforma los objetos en cosas imaginarias”?", "options": {"A": "Juegos de simbolismo.", "B": "Juegos de construcción.", "C": "Juegos de imitación.", "D": "Juegos de comunicación."}, "correct": "A"}, {"q": "¿De los elementos a considerar para evaluar la calidad de la información que se encuentra en internet, qué evalúa la valoración?", "options": {"A": "Es el proceso mediante el cual se verifica la información no obtenida en un contexto general del trabajo que se está realizando", "B": "Es el proceso mediante el cual se evalúa la información obtenida en un contexto general del trabajo que se está realizado", "C": "Es el proceso mediante el cual se evalúa la creatividad obtenida en un contexto manual del trabajo que se está realizado", "D": "Es el proceso mediante el cual se evalúa la información no obtenida en un contexto manual del trabajo que se está realizado"}, "correct": "B"}, {"q": "¿De los elementos a considerar para evaluar la calidad de la información que se encuentra en internet, qué evalúa la perspectiva?", "options": {"A": "Evalúa la experticia del autor en la temática publicada", "B": "Evalúa el nivel de importancia que no tiene la información encontrada con respecto al trabajo que no se está realizando", "C": "Evalúa en función de la veracidad de los datos, proporciones y porcentajes que contiene la publicación", "D": "Evalúa la experticia del revisor en la temática publicada"}, "correct": "A"}, {"q": "¿Cuáles de las siguientes opciones define cómo se aprende según la neurodidáctica? A) clases muy largas y con metodología tradicional B) se aprende haciendo C) trabajando de forma cooperativa D) emocionándonos", "options": {"A": "A-C-D", "B": "B-D-A", "C": "B-C-D", "D": "A-B-C"}, "correct": "C"}, {"q": "¿Qué es la lúdica?", "options": {"A": "Rama de la Psicomotricidad infantil.", "B": "Adjetivo que designa a todos aquellos procesos biológicos relativos al juego, recreación, ocio, entretenimiento o diversión.", "C": "Ciencia que invita a jugar exclusivamente a los niños.", "D": "Adjetivo que designa a todo aquello relativo al juego, recreación, ocio, entretenimiento o diversión. El término se origina del latín ludus que significa “juego”."}, "correct": "D"}, {"q": "¿Cuáles son los procesos cognitivos superiores que se abordan dentro de la educación emocional?", "options": {"A": "La metacognición y la autorregulación.", "B": "La memorización y la empatía.", "C": "La metacognición, la memorización y la empatía.", "D": "La autorregulación, la toma de decisiones y la empatía."}, "correct": "D"}, {"q": "Son manifestaciones que corresponden a la etapa lingüística, excepto:", "options": {"A": "Comprensión de frases complejas que aún tardarán en saber construir", "B": "Utilización de la tercera persona del singular de los verbos para referirse a sí mismos", "C": "Comienza a disponer de una capacidad lingüística que se va acercando a la de los adultos", "D": "Aumento del vocabulario a un ritmo exponencial"}, "correct": "B"}, {"q": "Según manifiesta Rodrigo y Palacios (1998), la familia tiene 4 funciones:", "options": {"A": "Garantizar un entorno saludable, cultivar un ambiente familiar de apoyo, no fomentar el desarrollo de habilidades sociales para la vida, ni facilitar el acceso a entornos educativos y sociales.", "B": "Garantizar la supervivencia y el crecimiento, cultivar un ambiente familiar carente de amor y apoyo, fomentar el desarrollo de habilidades personales para la vida.", "C": "Garantizar el crecimiento saludable, cultivar un ambiente familiar de apoyo, fomentar el desarrollo de habilidades de adaptación para la vida y limitar el acceso a la educación.", "D": "Garantizar la supervivencia y el crecimiento saludable, cultivar un ambiente familiar de afecto y apoyo, fomentar el desarrollo de habilidades de adaptación para la vida y facilitar el acceso a entornos educativos y sociales."}, "correct": "D"}, {"q": "¿Por qué son importantes los sentidos según la metodología Montessori durante los primeros tres años de vida?", "options": {"A": "Para inhibir el desarrollo cognitivo.", "B": "Para desarrollar únicamente habilidades físicas.", "C": "Para nutrir la mente del niño.", "D": "Para limitar el aprendizaje."}, "correct": "C"}, {"q": "Los precursores del lenguaje son habilidades y comportamientos que los bebés y los niños pequeños adquieren:", "options": {"A": "Durante la gestación", "B": "Antes de entender y expresar sus emociones", "C": "Antes de comenzar a hablar", "D": "Después de comenzar a hablar"}, "correct": "C"}, {"q": "¿Cuáles de los siguientes son retos a los que el docente se enfrenta en un aula inclusiva? A) Observar y conocer a cada uno de los alumnos. B) Promover el uso de metodologías de aprendizaje activas en clase. C) Partir de los intereses de los docentes y directivos de la Institución. D) Fomentar la participación de las familias.", "options": {"A": "B-C-D", "B": "A-B-D", "C": "A-C-D", "D": "A-B-C"}, "correct": "B"}, {"q": "¿Cuáles de las siguientes estrategias se han relacionado con la implementación exitosa de prácticas inclusivas en el contexto escolar? A) Formación docente B) Apadar unicamente el entorno físico C) Diseño de currículos inclusivos D) Promoción de la competencia y la competitividad entre estudiantes", "options": {"A": "A y B son correctos", "B": "A y C son correctos", "C": "C y D son correctos", "D": "B y C son correctos"}, "correct": "B"}, {"q": "Uno de los principales exponentes de la terapia humanista, la cual es un proceso centrado en el cliente y que valora la experiencia subjetiva y el potencial de crecimiento de cada individuo es:", "options": {"A": "Salvador Minuchin", "B": "Carl Rogers", "C": "Jay Haley", "D": "Virginia Satir"}, "correct": "B"}, {"q": "Según Vickers (2018), los primeros años de vida son cruciales para la prevención de enfermedades gracias a una _____________________ y otros hábitos saludables.", "options": {"A": "Ingesta de alimentos grasos", "B": "Dieta poco saludable", "C": "Alimentación adecuada", "D": "Dieta compuesta de alimentos procesados"}, "correct": "C"}, {"q": "Las Praxias del velo del paladar son:", "options": {"A": "Uno de los objetivos del logopeda.", "B": "Se relacionan con los movimientos de los labios dirigidos sobre todo para la articulación de los fonemas.", "C": "Movimientos realizados con la mandíbula dirigida a hablar, a la correcta masticación.", "D": "Movimientos relacionados con cómo se expulsa el aire y lo relacionado con la respiración durante el habla."}, "correct": "D"}, {"q": "¿Qué caracteriza a la mente consciente de un niño entre los tres y los seis años?", "options": {"A": "Es totalmente pasiva.", "B": "Está completamente consciente de su entorno.", "C": "No tiene capacidad de absorber conocimientos.", "D": "Comienza a desarrollar la conciencia."}, "correct": "D"}, {"q": "¿Es una herramienta para crear murales virtuales de forma colaborativa, en los que se pueden incluir elementos multimedia, vínculos y documentos?", "options": {"A": "Mindmeister", "B": "Voxopop", "C": "Padlet", "D": "Stormboard"}, "correct": "C"}, {"q": "Durante la etapa de juegos ________, los niños comienzan a experimentar con la coordinación de movimientos complejos y la interacción con otros niños en actividades más estructuradas.", "options": {"A": "sensoriomotores", "B": "de reglas", "C": "simbólicos", "D": "de construcción"}, "correct": "B"}, {"q": "¿Cómo pueden las redes y plataformas digitales contribuir al propósito de la veeduría ciudadana infantil?", "options": {"A": "Promoviendo la participación activa de los niños en el monitoreo y control de la gestión pública.", "B": "Facilitando la comunicación entre maestrantes.", "C": "Despertando el interés de los clientes en productos y servicios.", "D": "Promoviendo el desempeño académico de los alumnos."}, "correct": "A"}, {"q": "Las emociones son respuestas a estímulos significativos que constan de tres componentes: ______________, conductual y _______________.", "options": {"A": "Social - verbal", "B": "Mental - actitudinal", "C": "Atencional - kinestésico", "D": "Fisiológico - cognitivo"}, "correct": "D"}]</script>
 <script>
-(() => {
-  const qs = [
+(function(){
+  const ALL_Q = JSON.parse(document.getElementById('questions-data').textContent);
+  const LETTERS = ["A","B","C","D"];
 
-      {q:'Son aquellos que disminuyen la probabilidad de caer en un comportamiento de riesgo:',o:['Los factores emocionales','Los factores familiares','Los factores de riesgo','Los factores protectores'],a:3},
-      {q:'Los juegos tales como saltar la cuerda, el avioncito, jugar con el aro, son un excelente ejemplo de juegos que estimulan:',o:['Motricidad.','Cognición.','Sensibilidad.','Sensorial.'],a:0},
-      {q:'¿De los elementos a considerar para evaluar la calidad de la información que se encuentra en internet, qué describe la relevancia?',o:['Describe la función de la veracidad de los datos, proporciones y porcentajes que contiene la publicación','Describe el nivel de importancia que no tiene la información encontrada con respecto al trabajo que se está realizando','Describe el nivel de importancia que tiene la información encontrada con respecto al trabajo que se está realizando','Describe la función desde los datos, proporciones y porcentajes que contiene la metodología'],a:2},
-      {q:'Acciones determinantes del habla, coordinando las diferentes estructuras orales:',o:['Herramientas psicológicas','Praxias buco fonatorias','Mediación','Funciones mentales'],a:1},
-      {q:'Es el proceso mediante el cual los miembros de la familia establecen una sensación de continuidad, identidad y estabilidad.',o:['La retroalimentación','La circularidad','La equifinalidad','La permeabilidad familiar'],a:1},
-      {q:'¿De los elementos a considerar para evaluar la calidad de la información que se encuentra en internet, qué mide la confiabilidad?',o:['Trata de medir la reputación del sitio web en el que se ha publicado la información','Trata de medir la estructura del sitio web en el que se ha publicado la información','Trata de medir la redacción del sitio web en el que se ha publicado la información','Trata de medir la creatividad del sitio web en el que se ha publicado la información'],a:0},
-      {q:'Características exclusivas de los seres humanos:',o:['Sensación y percepción.','Cultura y lenguaje.','Comprensión.','Imaginación y memoria.'],a:1},
-      {q:'¿Es una aplicación que permite a las personas realizar reuniones y comunicarse en tiempo real a través de video, audio y chat en línea?',o:['Google Meet','Marqueed','Symbaloo','Voxopop'],a:0},
-      {q:'¿Qué es dominio web?',o:['El nombre del sitio web que no se muestra en la barra de herramientas.','El sitio web que se muestra en la barra de favoritos.','El nombre del sitio web que se muestra en la barra de herramientas.','El lugar del sitio web que se muestra en la barra de navegación.'],a:2},
-      {q:'Praxias que se constituyen como objetivos del logopeda:',o:['Praxias linguales.','Praxias del velo del paladar.','Todas las anteriores.','Praxias labiales.'],a:2},
-      {q:'¿Cómo absorbe el niño su entorno según la metodología Montessori?',o:['A través de los sentidos.','No absorbe su entorno.','Únicamente a través del intelecto.','A través del desarrollo de habilidades motoras.'],a:0},
-      {q:'Se recomienda que el docente evite liderar el juego en los rincones, y lo realice únicamente cuando sea necesario y por un mínimo tiempo. ¿En qué edad?',o:['Mayores de dos años.','6 años.','Mayores de 8 años.','1 año.'],a:0},
-      {q:'Seleccione la opción que defina mejor la conceptualización de Educación Inclusiva.',o:['Supone un modelo de educación que pretende atender a las necesidades de todos los niños y niñas.','Modelo para clasificar a la comunidad','Mecanismo que sirve para asegurar la defensa de los derechos de todos los niños y niñas.','Estrategias para atender únicamente a los niños regulares'],a:0},
-      {q:'La Neurociencia se constituye como una disciplina científica que estudia los distintos componentes del ____________, siendo uno de ellos ______________.',o:['Sistema endócrino – los riñones','Sistema locomotor – los huesos','Sistema respiratorio – los pulmones','Sistema nervioso – el cerebro'],a:3},
-      {q:'¿A qué se refiere la funcionalidad familiar?',o:['A la capacidad de una familia para funcionar de manera saludable, armoniosa y satisfactoria.','A la capacidad de adaptación y cambio dentro de la familia.','Al enfoque sistémico para comprender la dinámica familiar.','A la unión emocional y falta de compromiso entre los miembros de la familia.'],a:0},
-      {q:'Existe una serie de autores cuya idea principal es considerar que los juegos se clasifican en función al desarrollo de las cualidades motrices del niño o a los objetivos motores que el docente desea que sus alumnos alcancen. Este postulado hace referencia a:',o:['Clasificación de Tipos de Teorías motrices.','Tipos de pensamientos psicomotores.','Clasificación de los Juegos Motores.','Diferencia entre las habilidades motrices.'],a:2},
-      {q:'¿En qué ambientes el niño se forma ideas y conductas relacionadas con la competencia social?',o:['Hogar y parque.','Escuela y hogar.','Museo y parque.','Casa de un compañero.'],a:1},
-      {q:'¿A qué capacidades favorece la educación emocional?',o:['Comunicativas y relaciones interpersonales.','Razonamiento lógico matemático.','Relaciones interpersonales.','Comunicativas.'],a:0},
-      {q:'¿En qué consiste la teoría de las inteligencias múltiples?',o:['Refiere al aprendizaje en niños con NEE.','Postula el estudio de las capacidades del multiaprendizaje.','Menciona el uso de las tecnologías para un aprendizaje integral.','Se enfoca en el desarrollo cognitivo conductual.'],a:1},
-      {q:'¿A qué se refiere el Mindfulness?',o:['Prestar atención detenida a los recuerdos más profundos.','Interpretar situaciones momentáneas para emitir ideas de intervención a los recuerdos del pasado.','A la conciencia de adaptarse a situaciones incómodas.','A la conciencia plena que aparece al prestar atención deliberadamente en el momento presente y libre de juicios.'],a:3},
-      {q:'La teoría de la mente es la capacidad humana para atribuir pensamientos e intenciones a otras personas. ¿Cuáles son características de su desarrollo?',o:['Se empieza a desarrollar sobre los 3 y 5 años; comprender que cada persona piensa, percibe y siente cosas diferentes; y es crucial para el desarrollo socioemocional.','Fomenta únicamente el pensamiento egocéntrico.','Se desarrolla exclusivamente en la adultez.','Ninguna de las anteriores.'],a:0},
-      {q:'Es importante señalar que ______ no veía el desarrollo intelectual de los niños como un proceso cuantitativo.',o:['Piaget.','Chomsky.','Platón.','Kohlberg.'],a:0},
-      {q:'Designa la adquisición de habilidades que se observa en el niño de forma continua durante toda la infancia.',o:['El ejercicio psicomotor.','El desarrollo psicomotor.','El equilibrio psicomotor.','Proceso socioafectivo del área motora.'],a:1},
-      {q:'Bruner en las teorías del lenguaje menciona que los niños aprenden usando formas:',o:['Psicológicas.','Expresivas.','Abstractas.','Comunicativas.'],a:3},
-      {q:'¿Cuáles son las fases de la autorregulación?',o:['Planificación y autorreflexión.','Planificación, ejecución y autorreflexión.','Planificación y ejecución.','Planificación, ejecución y reflexión.'],a:1},
-      {q:'Al nacer un niño, sus movimientos son:',o:['Precisos.','Expresivos.','Involuntarios e inconscientes.','Voluntarios e inconscientes.'],a:2},
-      {q:'Son características de la educación socio afectiva, excepto:',o:['Ayuda a tener un buen autocontrol.','Se relaciona con el manejo de las emociones.','Potencia el desarrollo cognitivo.','Ayuda a tener una buena autoestima.'],a:2},
-      {q:'La capacidad para ______ es fundamental en el juego simbólico, ya que permite a los niños representar situaciones imaginarias y experimentar diferentes roles.',o:['Imitar.','Explorar.','Construir.','Coordinar.'],a:0},
-      {q:'¿Es una herramienta que forma parte del Google Workspace, permite crear presentaciones electrónicas dinámicas y en entorno web?',o:['Eduflow.','Educflow.','Google Slides.','Google Form.'],a:2},
-      {q:'Seleccione las opciones que constituyen el circuito cerebral de lectura:',o:['Área de Broca, corteza visual y lóbulos frontales.','Corteza visual y médula espinal.','Médula espinal y lóbulos frontales.','Únicamente el área de Broca.'],a:0},
-      {q:'¿Cómo se llama el proceso en el que el cerebro humano interpreta las sensaciones que recibe a través de los sentidos para formar una impresión consciente o inconsciente?',o:['Atención.','Percepción.','Sensación.','Memoria.'],a:1},
-      {q:'En la infancia, los niños experimentan una gama de emociones. El rol de la cuento-terapia en este proceso consiste en:',o:['Narrar un cuento.','Leer un cuento.','Expresar un cuento.','Entender y expresar sus emociones.'],a:3},
-      {q:'Beneficios de incorporar la lúdica como metodología de enseñanza en las aulas:',o:['Logros bajos de aprendizaje, confianza en sí mismo, alta motivación infantil.','Logros altos de aprendizaje, confianza en sí mismo, alta motivación infantil.','Logros altos de aprendizaje, poca confianza en sí mismo, alta motivación infantil.','Ninguna de las anteriores.'],a:1},
-      {q:'¿Cuál es la función del neurotransmisor noradrenalina?',o:['Modula la conducta social y las emociones.','Controla los movimientos voluntarios del cuerpo.','Regula las respuestas involuntarias.','Controla el enfoque mental y la atención.'],a:3},
-      {q:'Es la implicación de la familia en la toma de decisiones y en las responsabilidades relacionadas con el mantenimiento familiar. ¿De qué componente del APGAR familiar estamos hablando?',o:['Participación.','Adaptación.','Gradiente de recursos.','Capacidad resolutiva.'],a:0},
-      {q:'¿Cómo podría beneficiar a un niño el fomentar sus habilidades interculturales y competencias emocionales en su infancia?',o:['Interactuar de manera efectiva y respetuosa con personas de diferentes culturas.','Contribuye al aprendizaje de varios idiomas.','Bajo nivel de aprendizaje.','Mejora solo el razonamiento lógico.'],a:0},
-      {q:'¿En qué periodo de la infancia se desarrollan juegos que requieren coordinación y habilidades motoras más complejas, como los deportes o juegos de equipo?',o:['Etapa de juegos sensoriomotores.','Etapa de juegos de reglas.','Etapa de juegos de construcción.','Etapa de juegos simbólicos.'],a:1},
-      {q:'Este modelo tiene como características orientar y aconsejar a las personas en cuanto a la toma de decisiones. ¿A qué modelo nos referimos?',o:['Modelo de consejo.','Modelo de intervención.','Modelo de programas.','Modelo familiar.'],a:0},
-      {q:'Durante el proceso de producción y gestión de contenidos educativos digitales, es importante considerar:',o:['La disponibilidad de recursos tecnológicos con los que no cuentan nuestros estudiantes.','La no disponibilidad de recursos tecnológicos con los que cuentan nuestros estudiantes.','La asignación de recursos no tecnológicos con los que cuentan nuestros estudiantes.','La disponibilidad de recursos tecnológicos con los que cuentan nuestros estudiantes y conocer qué tipo de dispositivo electrónico utilizan como herramienta de estudio en internet.'],a:3},
-      {q:'Tanto el encéfalo como la médula espinal están protegidos por huesos: el encéfalo, por los ____________, y la médula espinal, por una serie de huesos entrelazados en forma de anillo, llamados ____________.',o:['Huesos del esternón – costillas.','Huesos del coxis – falanges.','Huesos de la rótula – metatarsos.','Huesos del cráneo – vértebras.'],a:3},
-      {q:'Completa el siguiente enunciado con la opción correcta: La Convención sobre los Derechos del Niño (1989), establece el ________ de los niños a la ___________ de su identidad cultural, incluyendo su lengua y sus tradiciones.',o:['Derecho – preservación','Juego – visión','Derecho – visión','Pensamiento – necesidad'],a:0},
-      {q:'Seleccione cuáles de las siguientes son funciones cognitivas superiores.',o:['Lenguaje','Pensamiento','Atención','Razonamiento'],a:1},
-      {q:'Son pilares de la educación, excepto:',o:['Aprender a hacer.','Aprender a saber.','Aprender a vivir juntos.','Aprender a existir.'],a:3},
-      {q:'Son movimientos pequeños de la motricidad fina, excepto:',o:['Cortar con tijera.','Realizar nudos.','Rasgar.','Jugar con una pelota.'],a:3},
-      {q:'¿A qué contribuye el reconocer y valorar la diversidad cultural y étnica de los países?',o:['A enriquecer la sociedad y promover la igualdad','A mejorar el aprendizaje de los docentes','A enriquecer a las empresas','Al aumento en el producto interno bruto'],a:0},
-      {q:'Completa el siguiente enunciado con las opciones correctas: La participación ciudadana apoya la implantación de los ____________ de ___________ y honestidad y la disminución de la discrecionalidad de las autoridades y funcionarios.',o:['Recursos – Transparencia.','Principios – Transparencia.','Discursos – transparencia.','Principios – Arbitrariedad.'],a:1},
-      {q:'Se producen en el organismo una inmensa cantidad de reflejos condicionados de diferentes orígenes, que surgen como resultado de la acción de estímulos complejos y combinaciones, los cuales constituyen la base del desarrollo:',o:['Social.','Motriz.','Cognitivo.','Sensorial.'],a:2},
-      {q:'Conceptos relacionados con el Sistema Familiar:',o:['La permeabilidad familiar - La circularidad - La retroalimentación - La equifinalidad.','El mesosistema - El exosistema - El macrosistema.','La permeabilidad familiar - El exosistema - Niveles de intervención.','Estilo autoritario - La orientación familiar - Niveles de intervención - La circularidad.'],a:0},
-      {q:'¿Qué se entiende por la empatía en la infancia?',o:['La capacidad de los niños para resolver conflictos de manera pacífica.','La capacidad de los niños para aprender.','La capacidad de los niños para mejorar su autoestima.','La capacidad de los niños para comprender y compartir los sentimientos de los demás.'],a:3},
-      {q:'¿En qué consiste la inteligencia espacial?',o:['Los niños aprenden viendo el lenguaje, expresándolo y utilizándolo.','Los niños aprenden observando e interactuando con plantas y animales.','Los niños aprenden visualizando con los ojos de la mente y traduciendo lo que ven en alguna forma tangible.','Los niños aprenden buscando patrones y relaciones entre objetos y hechos.'],a:2},
-      {q:'¿Qué es el desarrollo psicomotor?',o:['Es aquel que sigue un ritmo marcado, en el que los diferentes progresos correspondientes a cada edad quedan encadenados. Una vez que se adquiere una habilidad motriz, ésta se perfecciona y posteriormente se aprende una nueva.','Desarrollo de resistencia propioceptiva.','Aquel que sigue un andamiaje marcado, en el que los diferentes progresos correspondientes a cada edad quedan encadenados. Una vez que se adquiere una emoción ésta se perfecciona y posteriormente se aprende una nueva.','Es el proceso de adquisición de estructuras cognitivas y socioafectivas.'],a:0},
-      {q:'¿A qué se refiere la permeabilidad familiar?',o:['Se refiere a un conjunto de funciones que se ejecutan de forma consciente o inconsciente entre los integrantes de una familia.','Se refiere a cómo la familia se relaciona con otros sistemas.','Se refiere al comportamiento social con la familia y entorno.','Se refiere al proceso mediante el cual los miembros de la familia establecen una sensación de continuidad, identidad y estabilidad.'],a:1},
-      {q:'¿Cómo describe Montessori la capacidad de aprendizaje de los niños en sus primeros años?',o:['Limitada y predecible.','Frágil y reversible.','Aleatoria y discontinua.','Ilimitada y continua.'],a:3},
-      {q:'De las características de los recursos digitales educativos, ¿qué sería la interactividad?',o:['Es un concepto tecnológico que no facilita el acceso a archivos, recursos, aplicaciones, sistemas y demás elementos que se encuentran almacenados en algún servidor de internet.','El diseño de recursos interactivos que proporcionan una base para una experiencia de aprendizaje más atractiva.','Son elementos clave que añaden una dimensión multisensorial a la información exponiéndola con mayor riqueza de matices.','El diseño de recursos interactivos que proporcionan una base para una experiencia de aprendizaje más compleja.'],a:1},
-      {q:'¿Qué se entiende por competencias emocionales en la infancia?',o:['La capacidad de los niños para mejorar su rendimiento.','La capacidad de los niños para reconocer y regular sus emociones.','La capacidad de los niños para interactuar con personas de diferentes culturas.','La capacidad de los niños para aprender varios idiomas.'],a:1},
-      {q:'¿Qué promueve el programa de Educación Inicial y Desarrollo Infantil “Buen Vivir”?',o:['Prioriza el acceso universal y equitativo a la educación inicial.','Limita la participación activa de las familias en el proceso educativo.','Promueve un enfoque inclusivo, intercultural y de género.','Fomenta exclusivamente el desarrollo motor de los niños.'],a:2},
-      {q:'¿Qué aspecto se destaca en relación con el niño o la niña en la metodología Montessori?',o:['Su libertad y autonomía para jugar y aprender.','Su capacidad de aprender a un ritmo preestablecido.','Su falta de interés en el entorno natural.','Su dependencia total de la guía de los adultos.'],a:0},
-      {q:'¿Cómo es conocido el proceso por el cual el niño o niña identifica emociones y sentimientos, a la vez que aprende a manejarlos adecuadamente?',o:['Desarrollo motor fino','Desarrollo afectivo','Desarrollo motor grueso','Desarrollo cognitivo'],a:1},
-      {q:'¿Cómo se refiere la Dra. Montessori a los entornos de aprendizaje?',o:['Como elementos irrelevantes para el proceso educativo.','Como obstáculos para el aprendizaje.','Como elementos secundarios en la educación.','Como el medio que rodea al estudiante y el material didáctico utilizado.'],a:3},
-      {q:'¿A qué edad el niño tendrá un repertorio básico lingüístico?',o:['De los 2 a 6 años','De 1 a 2 años','De 1 a 3 años','De los 6 a 9 años'],a:0},
-      {q:'Son habilidades cognitivas, excepto:',o:['Concentración','Memoria','Esquema corporal','Atención'],a:2},
-      {q:'¿Qué significa la inclusividad en el contexto escolar?',o:['Ignorar las necesidades individuales de los estudiantes.','Asegurar que todos los estudiantes tengan acceso a la educación de calidad.','Permitir que solo algunos estudiantes participen en actividades extracurriculares.','Limitar el acceso a la educación solo a ciertos grupos de estudiantes.'],a:1},
-      {q:'¿Cuáles son las consideraciones de la crianza positiva para el desarrollo de un niño?',o:['Educar con premios y castigos.','El respeto a los hijos, criar con amor y sobre todo, realizar sin el uso de la violencia.','El respeto a los hijos, a partir de acuerdos y premios de recompensa.','Criar mediante el establecimiento de reglas poco flexibles.'],a:1},
-      {q:'¿De los elementos a considerar para evaluar la calidad de la información que se encuentra en internet, en qué se valora la exactitud?',o:['Se valora el nivel de importancia que tiene la información encontrada con respecto al trabajo que se está realizando','Se valora en función de la veracidad de los datos, proporciones y porcentajes que contiene la publicación','Se valora el nivel de importancia que no tiene la información encontrada con respecto al trabajo que no se está realizando','Se valora la función de la veracidad de los datos, proporciones y porcentajes que no contiene la publicación'],a:1},
-      {q:'Estructura Familiar: Se define como un conjunto de funciones que se ejecutan de forma consciente o inconsciente entre los integrantes de una familia, y se modifican a partir de:',o:['las habilidades intelectuales','las reglas y límites','las necesidades o las expectativas','la negociación de reglas y criterios'],a:2},
-      {q:'¿A los cuántos meses un bebé logra interpretar las expresiones faciales, entre otras acciones propias de la primera infancia?',o:['De 6 a 7 meses','De 8 a 10 meses','De 12 a 24 meses','De 4 a 5 meses'],a:1},
-      {q:'¿A qué contribuyen los alimentos reguladores?',o:['A la formación de los huesos.','A los procesos metabólicos del cuerpo.','Al proceso celular correcto.','Al crecimiento de todos los órganos del cuerpo.'],a:1},
-      {q:'¿En qué se basan principalmente las herramientas de la Web 2.0?',o:['En la versatilidad de tienen los sitios web y el gran potencial educativo que pueden llegar a tener.','En herramientas que no potencian la comunicación, la interacción, el consumo, la producción y la coproducción de recursos, contenidos y materiales.','Conexión continua, segura, de buena calidad y estabilidad para garantizar el acceso a los recursos y la interacción entre los participantes.','En un importante componente social, en este sentido estas herramientas potencian la comunicación, la interacción, el consumo, la producción y la coproducción de recursos, contenidos y materiales.'],a:3},
-      {q:'Capacidad de utilizar recursos intra y extra familiares para resolver problemas en situaciones de estrés familiar o periodos de crisis. ¿De qué componente del APGAR familiar estamos hablando?',o:['Participación','Adaptación','Capacidad resolutiva','Gradiente de recursos'],a:1},
-      {q:'Seleccione cuáles de las siguientes son funciones cognitivas básicas.',o:['Percepción','Capacidad abstracta','Atención','Memoria'],a:3},
-      {q:'Seleccione qué cambios puede producir la práctica de Mindfulness.',o:['Fortalece la atención','Incrementa el potencial del cerebro','Desregulación emocional','Potencia la producción de anticuerpos'],a:1},
-      {q:'Período comprendido entre los 0 y los 12 meses en el cual el niño emite ruidos y se hace sensible a ellos y no usa palabras:',o:['Etapa de combinación','Etapa holofrástica','Etapa lingüística','Etapa prelingüística'],a:3},
-      {q:'¿Es una metodología de enseñanza centrada en el estudiante, el cual construye su conocimiento mediante la ejecución de proyectos o actividades prácticas significativas?',o:['Aprendizaje Basado en Contenido','Aprendizaje Basado en Exámenes','Aprendizaje Basado en Proyectos','Aprendizaje Basado en Memorización'],a:2},
-      {q:'Basados en la teoría del cerebro triuno de Paul MacLean, seleccione la opción que contenga las características del cerebro reptiliano. A) Con muy poco o ningún proceso sentimental. B) Pensamiento instintivo. C) Asegura la supervivencia. D) Almacena la memoria.',o:['A-B-C','B-D-A','A-C-D','B-C-D'],a:0},
-      {q:'Período en el cual el niño empieza a construir sus primeras oraciones con sujeto y predicado y aprende a realizar las entonaciones de las oraciones interrogativas.',o:['Entre los 0 y los 12 meses','De los 12 a los 24 meses','Entre los dos y los tres años','Hacia los 12 meses'],a:2},
-      {q:'¿Qué beneficio se destaca del aprendizaje por descubrimiento en comparación con el aprendizaje tradicional?',o:['No promueve la reflexión ni la hipótesis.','No estimula la creatividad.','Potencia la solución creativa de problemas.','Limita la autonomía del estudiante.'],a:2},
-      {q:'¿Cuál es el papel de las escuelas en relación con la formación ciudadana y la convivencia democrática?',o:['Mantener un espíritu de uniformidad que inhibe la diversidad de opiniones.','Contribuir a la formación de ciudadanos críticos y activos en una sociedad democrática.','Facilitar la reproducción de las estructuras sociales existentes.','Restringir el acceso a saberes y discursos que fomenten la participación ciudadana.'],a:1},
-      {q:'La etapa del bebé entre los ______ consiste en jugar con los objetos, manipulándolos y explorándolos sensorialmente (sonajeros, mordedores, muñecos de diferentes texturas).',o:['4 – 8 días','4 – 8 años','Ninguna de las anteriores','4 – 8 meses.'],a:3},
-      {q:'¿Qué tipo de juego permite a los niños explorar sus emociones y experimentar diferentes roles en un entorno seguro?',o:['Juego simbólico','Juego de construcción','Juego de reglas','Juego sensoriomotor'],a:0},
-      {q:'¿En qué consiste el panel de la emoción?',o:['Es un recurso interesante para enseñar a los estudiantes a poner en palabras las emociones que sienten','Consiste en intercambiar abrazos durante un tiempo de cinco minutos aproximadamente.','Consiste en una rutina de pensamiento que favorece al desarrollo de habilidades cognitivas','Es un recurso que permite relajar el cuerpo y entrar en estado de paz.'],a:0},
-      {q:'¿Cuál es el sistema social que representa entornos y situaciones donde no se tiene un contacto directo, pero que acaban influyendo? Por ejemplo: el niño no forma parte de los consejos ciudadanos, pero las políticas que establezcan influyen en su familia, su educación y experiencias recreativas.',o:['Mesosistema','Exosistema','Macrosistema','Microsistema'],a:1},
-      {q:'¿Cuáles de las siguientes afirmaciones describe un beneficio del mapeo y diagnóstico participativo?',o:['Permite recopilar información cualitativa y cuantitativa sobre el entorno y las necesidades de la comunidad.','Limita la participación activa de los niños en la identificación de recursos.','Facilita la identificación de lugares importantes en el entorno de los niños.','Fomenta el desarrollo de la comunidad.'],a:1},
-      {q:'Las conexiones neuronales son recubiertas por una sustancia vital, evitando que los aprendizajes se pierdan. ¿Cuál es el nombre de este proceso?',o:['Mielinización','Refinamiento neuronal','Poda neuronal','Proliferación neuronal'],a:0},
-      {q:'¿Es una herramienta dinámica que permite crear contenido digital de manera individual o colaborativa? Presentaciones, infografías, imágenes interactivas, entre otras.',o:['Genially','Jenially','Eduflow','Educflow'],a:0},
-      {q:'Es importante identificar los procesos o dinámicas que utilizan las familias para llegar a soluciones, con el fin de determinar:',o:['Comunicación','Funcionamiento emocional','Estructura familiar','Patrones de interacción'],a:3},
-      {q:'¿Qué es el juego sensoriomotor?',o:['Es un tipo de juego que consiste en la construcción a partir de materiales.','Es un tipo de juego que involucra cumplimiento de reglas.','Es un tipo de juego característico de los adolescentes de 12 años.','Es un tipo de juego que consiste, principalmente, en la repetición de ciertas acciones con el fin de obtener un resultado inmediato y placentero.'],a:3},
-      {q:'¿A los cuántos meses, un bebé logra asociar el significado emocional con las expresiones faciales?',o:['A los 24 meses','A los 3 meses','A los 8 a los 12 meses','A los 4 a 7 meses'],a:2},
-      {q:'¿Qué ocurre en el bebé entre el segundo y cuarto mes?',o:['Nos encontramos con un tipo de conducta denominada reacción circular primaria. El bebé obtiene un resultado placentero que le invita a repetir esas acciones una y otra vez.','Nos encontramos con un tipo de conducta denominada asimilación circular primaria. El bebé obtiene un resultado desagradable que le invita a repetir esas acciones una y otra vez.','Nos encontramos con un tipo de conducta denominada acomodación circular secundaria. El bebé obtiene un resultado desagradable que le invita a repetir esas acciones una y otra vez.','Todas las anteriores.'],a:0},
-      {q:'¿A qué se refiere la inteligencia interpersonal?',o:['Los niños aprenden relacionándose con otros y colaborando.','Capacidad de reconocer los propios sentimientos y emociones.','Los niños aprenden buscando patrones entre objetos y hechos','Los niños aprenden a través del tacto y del movimiento'],a:0},
-      {q:'Según Hoffman (2018), ¿qué implica la circularidad?',o:['Implica la interacción de los miembros de la familia.','Implica las reglas y límites entre los miembros de la familia.','Implica la relación con otros sistemas.','Implica la negociación de reglas, acuerdos, responsabilidades.'],a:0},
-      {q:'Tipo de praxia que se relaciona con los movimientos de los labios dirigidos sobre todo para la articulación de los fonemas:',o:['Praxias del velo del paladar','Praxias labiales','Praxias de mandíbula','Praxias linguales'],a:1},
-      {q:'¿De qué dependerá el éxito de la migración de la escuela a entornos digitales?',o:['De la capacidad que tengan los estudiantes para no convertirse en entes transformadores, críticos y participativos de esta iniciativa digital','De la capacidad que tengan los profesores para convertirse en entes transformadores, críticos y participativos de esta iniciativa digital','De la capacidad que tengan los profesores para no convertirse en entes transformadores, críticos y participativos de esta iniciativa digital','De la capacidad que tengan los estudiantes para convertirse en entes transformadores, críticos y participativos de esta iniciativa digital'],a:1},
-      {q:'¿Cuál es el objetivo de implementar mecanismos de participación como consejos estudiantiles, asambleas escolares y mesas de diálogo con niños, niñas y adolescentes?',o:['La construcción de espacios de recreación','La construcción de edificios adaptados a personas con discapacidad','El desarrollo de políticas públicas que los beneficien','El desarrollo de sus habilidades sociales'],a:2},
-      {q:'La neurona es la unidad básica del sistema nervioso central ¿Cuál es su función principal?',o:['Procesar alimentos para descomponerlos en sustancias.','Llevar oxígeno del aire a la sangre.','Metabolismo y reproducción.','Transmitir información a través de impulsos nerviosos.'],a:3},
-      {q:'¿A qué tipo de juegos se refiere la frase: “En el juego de construcción de casitas de muñecas y de construir con cubos también se observan juegos simbólicos donde el niño transforma los objetos en cosas imaginarias”?',o:['Juegos de simbolismo.','Juegos de construcción.','Juegos de imitación.','Juegos de comunicación.'],a:0},
-      {q:'¿De los elementos a considerar para evaluar la calidad de la información que se encuentra en internet, qué evalúa la valoración?',o:['Es el proceso mediante el cual se verifica la información no obtenida en un contexto general del trabajo que se está realizando','Es el proceso mediante el cual se evalúa la información obtenida en un contexto general del trabajo que se está realizado','Es el proceso mediante el cual se evalúa la creatividad obtenida en un contexto manual del trabajo que se está realizado','Es el proceso mediante el cual se evalúa la información no obtenida en un contexto manual del trabajo que se está realizado'],a:1},
-      {q:"¿De los elementos a considerar para evaluar la calidad de la información que se encuentra en internet, qué evalúa la perspectiva?",o:["Evalúa la experticia del autor en la temática publicada", "Evalúa el nivel de importancia que no tiene la información encontrada con respecto al trabajo que no se está realizando", "Evalúa en función de la veracidad de los datos, proporciones y porcentajes que contiene la publicación", "Evalúa la experticia del revisor en la temática publicada"],a:0},
-      {q:"¿Cuáles de las siguientes opciones define cómo se aprende según la neurodidáctica? A) clases muy largas y con metodología tradicional B) se aprende haciendo C) trabajando de forma cooperativa D) emocionándonos",o:["A-C-D", "B-D-A", "B-C-D", "A-B-C"],a:2},
-      {q:"¿Qué es la lúdica?",o:["Rama de la Psicomotricidad infantil.", "Adjetivo que designa a todos aquellos procesos biológicos relativos al juego, recreación, ocio, entretenimiento o diversión.", "Ciencia que invita a jugar exclusivamente a los niños.", "Adjetivo que designa a todo aquello relativo al juego, recreación, ocio, entretenimiento o diversión. El término se origina del latín ludus que significa “juego”."],a:3},
-      {q:"¿Cuáles son los procesos cognitivos superiores que se abordan dentro de la educación emocional?",o:["La metacognición y la autorregulación.", "La memorización y la empatía.", "La metacognición, la memorización y la empatía.", "La autorregulación, la toma de decisiones y la empatía."],a:3},
-      {q:"Son manifestaciones que corresponden a la etapa lingüística, excepto:",o:["Comprensión de frases complejas que aún tardarán en saber construir", "Utilización de la tercera persona del singular de los verbos para referirse a sí mismos", "Comienza a disponer de una capacidad lingüística que se va acercando a la de los adultos", "Aumento del vocabulario a un ritmo exponencial"],a:1},
-      {q:"Según manifiesta Rodrigo y Palacios (1998), la familia tiene 4 funciones:",o:["Garantizar un entorno saludable, cultivar un ambiente familiar de apoyo, no fomentar el desarrollo de habilidades sociales para la vida, ni facilitar el acceso a entornos educativos y sociales.", "Garantizar la supervivencia y el crecimiento, cultivar un ambiente familiar carente de amor y apoyo, fomentar el desarrollo de habilidades personales para la vida.", "Garantizar el crecimiento saludable, cultivar un ambiente familiar de apoyo, fomentar el desarrollo de habilidades de adaptación para la vida y limitar el acceso a la educación.", "Garantizar la supervivencia y el crecimiento saludable, cultivar un ambiente familiar de afecto y apoyo, fomentar el desarrollo de habilidades de adaptación para la vida y facilitar el acceso a entornos educativos y sociales."],a:3},
-      {q:"¿Por qué son importantes los sentidos según la metodología Montessori durante los primeros tres años de vida?",o:["Para inhibir el desarrollo cognitivo.", "Para desarrollar únicamente habilidades físicas.", "Para nutrir la mente del niño.", "Para limitar el aprendizaje."],a:2},
-      {q:"Los precursores del lenguaje son habilidades y comportamientos que los bebés y los niños pequeños adquieren:",o:["Durante la gestación", "Antes de entender y expresar sus emociones", "Antes de comenzar a hablar", "Después de comenzar a hablar"],a:2},
-      {q:"¿Cuáles de los siguientes son retos a los que el docente se enfrenta en un aula inclusiva? A) Observar y conocer a\ncada uno de los alumnos. B) Promover el uso de\nmetodologías de aprendizaje activas en clase. C) Partir de los\nintereses de los docentes y directivos de la Institución. D)\nFomentar la participación de las familias.",o:["B-C-D", "A-B-D", "A-C-D", "A-B-C"],a:1},
-      {q:"¿Cuáles de las siguientes estrategias se han relacionado con la implementación exitosa de prácticas inclusivas en el contexto escolar? A) Formación\ndocente B) Apadar unicamente el entorno físico C) Diseño de currículos inclusivos D)     Promoción\nde la competencia y la competitividad entre estudiantes",o:["A y B son correctos", "A y C son correctos", "C y D son correctos", "B y C son correctos"],a:1},
-      {q:"Uno de los principales exponentes de la terapia humanista, la cual es un proceso centrado en el cliente y que valora la experiencia subjetiva y el potencial de crecimiento de cada individuo es:",o:["Salvador Minuchin", "Carl Rogers", "Jay Haley", "Virginia Satir"],a:1},
-      {q:"Según Vickers (2018), los primeros años de vida son cruciales para la prevención de enfermedades gracias a una _____________________ y otros hábitos saludables.",o:["Ingesta de alimentos grasos", "Dieta poco saludable", "Alimentación adecuada", "Dieta compuesta de alimentos procesados"],a:2},
-      {q:"Las Praxias del velo del paladar son:",o:["Uno de los objetivos del logopeda.", "Se relacionan con los movimientos de los labios dirigidos sobre todo para la articulación de los fonemas.", "Movimientos realizados con la mandíbula dirigida a hablar, a la correcta masticación.", "Movimientos relacionados con cómo se expulsa el aire y lo relacionado con la respiración durante el habla."],a:3},
-      {q:"¿Qué caracteriza a la mente consciente de un niño entre los tres y los seis años?",o:["Es totalmente pasiva.", "Está completamente consciente de su entorno.", "No tiene capacidad de absorber conocimientos.", "Comienza a desarrollar la conciencia."],a:3},
-      {q:"¿Es una herramienta para crear murales virtuales de forma colaborativa, en los que se pueden incluir elementos multimedia, vínculos y documentos?",o:["Mindmeister", "Voxopop", "Padlet", "Stormboard"],a:2},
-      {q:"Durante la etapa de juegos ________, los niños comienzan a experimentar con la coordinación de movimientos complejos y la interacción con otros niños en actividades más estructuradas.",o:["sensoriomotores", "de reglas", "simbólicos", "de construcción"],a:1},
-      {q:"¿Cómo pueden las redes y plataformas digitales contribuir al propósito de la veeduría ciudadana infantil?",o:["Promoviendo la participación activa de los niños en el monitoreo y control de la gestión pública.", "Facilitando la comunicación entre maestrantes.", "Despertando el interés de los clientes en productos y servicios.", "Promoviendo el desempeño académico de los alumnos."],a:0},
-      {q:"Las emociones son respuestas a estímulos significativos que constan de tres componentes: ______________, conductual y _______________.",o:["Social - verbal", "Mental - actitudinal", "Atencional - kinestésico", "Fisiológico - cognitivo"],a:3}
+  const screenSetup = document.getElementById('screen-setup');
+  const screenQuiz = document.getElementById('screen-quiz');
+  const screenResults = document.getElementById('screen-results');
+  const modeGrid = document.getElementById('mode-grid');
+
+  const qPosition = document.getElementById('q-position');
+  const qScore = document.getElementById('q-score');
+  const progressFill = document.getElementById('progress-fill');
+  const qCard = document.getElementById('q-card');
+  const qText = document.getElementById('q-text');
+  const qOptions = document.getElementById('q-options');
+  const qFeedback = document.getElementById('q-feedback');
+  const btnNext = document.getElementById('btn-next');
+  const btnQuit = document.getElementById('btn-quit');
+  const btnRestart = document.getElementById('btn-restart');
+
+  const resPct = document.getElementById('res-pct');
+  const resLbl = document.getElementById('res-lbl');
+  const resTitle = document.getElementById('res-title');
+  const resSummary = document.getElementById('res-summary');
+  const reviewList = document.getElementById('review-list');
+
+  const MODES = [
+    { id:'r20', n:'20', label:'Repaso rápido', desc:'20 preguntas al azar. Ideal para una pausa corta.' },
+    { id:'r40', n:'40', label:'Repaso medio', desc:'40 preguntas al azar. Un vistazo más completo.' },
+    { id:'all', n:String(ALL_Q.length), label:'Banco completo', desc:'Las ' + ALL_Q.length + ' preguntas, en orden aleatorio.' },
   ];
 
-  const $ = id => document.getElementById(id);
-  const setup=$('setup'), quiz=$('quiz'), result=$('result');
-  const startBtn=$('startBtn'), clearHistoryBtn=$('clearHistoryBtn'), countSelect=$('countSelect'), modeSelect=$('modeSelect'), shuffleSelect=$('shuffleSelect');
-  const questionText=$('questionText'), options=$('options'), feedback=$('feedback'), nextBtn=$('nextBtn'), restartBtn=$('restartBtn'), exitBtn=$('exitBtn');
-  const posText=$('posText'), correctText=$('correctText'), wrongText=$('wrongText'), timerText=$('timerText'), progress=$('progress'), flagBtn=$('flagBtn'), qLabel=$('qLabel');
-  const bestPill=$('bestPill'), setupMsg=$('setupMsg');
+  MODES.forEach(function(m){
+    const btn = document.createElement('button');
+    btn.className = 'mode-card';
+    btn.innerHTML = '<span class="n">' + m.n + '</span><span class="label">' + m.label + '</span><span class="desc">' + m.desc + '</span>';
+    btn.addEventListener('click', function(){ startQuiz(m); });
+    modeGrid.appendChild(btn);
+  });
 
-  let session=[], idx=0, correct=0, wrong=0, answered=false, current=null, startedAt=0, timerId=null, sessionWrong=[];
-
-  const readSet = key => new Set(JSON.parse(localStorage.getItem(key)||'[]'));
-  const saveSet = (key,set) => localStorage.setItem(key, JSON.stringify([...set]));
-  const shuffle = arr => {
-    const a=[...arr];
-    for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}
+  function shuffle(arr){
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
     return a;
-  };
-  const fmtTime = sec => String(Math.floor(sec/60)).padStart(2,'0')+':'+String(sec%60).padStart(2,'0');
-  const getId = q => qs.indexOf(q);
-
-  function updateBestPill(){
-    const best=localStorage.getItem('complexivo_best');
-    bestPill.textContent=best?`Mejor resultado: ${best}%`:'Mejor resultado: —';
   }
 
-  function makeSession(mode,count){
-    let pool=qs.map((q,i)=>({...q,id:i}));
-    if(mode==='missed'){
-      const missed=readSet('complexivo_missed');
-      pool=pool.filter(q=>missed.has(q.id));
-    } else if(mode==='flagged'){
-      const flagged=readSet('complexivo_flagged');
-      pool=pool.filter(q=>flagged.has(q.id));
-    }
-    pool=shuffle(pool);
-    if(count!=='all') pool=pool.slice(0,Math.min(Number(count),pool.length));
-    return pool;
+  let session = null;
+
+  function startQuiz(mode){
+    let pool = shuffle(ALL_Q);
+    if (mode.id === 'r20') pool = pool.slice(0, 20);
+    if (mode.id === 'r40') pool = pool.slice(0, 40);
+    session = {
+      questions: pool,
+      index: 0,
+      correctCount: 0,
+      answered: false,
+      log: []
+    };
+    screenSetup.classList.add('hidden');
+    screenResults.classList.add('hidden');
+    screenQuiz.classList.remove('hidden');
+    renderQuestion();
   }
 
-  function start(modeOverride=null){
-    const mode=modeOverride||modeSelect.value;
-    session=makeSession(mode,countSelect.value);
-    if(!session.length){
-      setupMsg.textContent = mode==='missed'
-        ? 'Todavía no tienes preguntas falladas guardadas.'
-        : mode==='flagged' ? 'Todavía no tienes preguntas marcadas para repasar.' : 'No hay preguntas disponibles.';
-      return;
-    }
-    setupMsg.textContent='';
-    idx=0; correct=0; wrong=0; answered=false; sessionWrong=[];
-    startedAt=Date.now();
-    clearInterval(timerId);
-    timerId=setInterval(updateTimer,1000);
-    setup.style.display='none'; result.style.display='none'; quiz.style.display='block';
-    render();
-  }
+  function renderQuestion(){
+    const total = session.questions.length;
+    const i = session.index;
+    const item = session.questions[i];
+    session.answered = false;
 
-  function updateTimer(){
-    timerText.textContent=fmtTime(Math.floor((Date.now()-startedAt)/1000));
-  }
+    qPosition.textContent = 'Pregunta ' + (i + 1) + ' / ' + total;
+    qScore.textContent = 'Aciertos: ' + session.correctCount;
+    progressFill.style.width = ((i) / total * 100) + '%';
+    qCard.setAttribute('data-num', 'Ficha ' + String(i + 1).padStart(3, '0'));
 
-  function shuffledCurrent(q){
-    const items=q.o.map((text,i)=>({text,orig:i,correct:i===q.a}));
-    const list=shuffleSelect.value==='yes'?shuffle(items):items;
-    return {...q,display:list,correctIndex:list.findIndex(x=>x.correct)};
-  }
+    qText.textContent = item.q;
+    qFeedback.className = 'feedback';
+    qFeedback.textContent = '';
+    qOptions.innerHTML = '';
+    btnNext.disabled = true;
+    btnNext.textContent = (i === total - 1) ? 'Ver resultados' : 'Siguiente';
 
-  function render(){
-    answered=false; nextBtn.disabled=true; feedback.className='feedback'; feedback.innerHTML='';
-    current=shuffledCurrent(session[idx]);
-    posText.textContent=`${idx+1}/${session.length}`;
-    correctText.textContent=correct; wrongText.textContent=wrong;
-    progress.style.width=((idx/session.length)*100)+'%';
-    qLabel.textContent=`Pregunta ${idx+1} de ${session.length}`;
-    questionText.textContent=current.q;
-    options.innerHTML='';
-    current.display.forEach((item,i)=>{
-      const b=document.createElement('button');
-      b.className='option'; b.type='button';
-      b.innerHTML=`<span class="letter">${String.fromCharCode(65+i)}</span><span>${escapeHtml(item.text)}</span>`;
-      b.addEventListener('click',()=>choose(i,b));
-      options.appendChild(b);
+    LETTERS.forEach(function(letter){
+      const optText = item.options[letter];
+      if (!optText) return;
+      const opt = document.createElement('button');
+      opt.className = 'opt';
+      opt.innerHTML = '<span class="letter">' + letter + '</span><span>' + optText + '</span>';
+      opt.addEventListener('click', function(){ selectOption(letter, opt, item); });
+      qOptions.appendChild(opt);
     });
-    updateFlagButton();
-    nextBtn.textContent=idx===session.length-1?'Ver resultado':'Siguiente';
   }
 
-  function escapeHtml(text){
-    return String(text).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
-  }
+  function selectOption(letter, optEl, item){
+    if (session.answered) return;
+    session.answered = true;
+    const correct = item.correct;
+    const isRight = letter === correct;
+    if (isRight) session.correctCount++;
 
-  function choose(choice,btn){
-    if(answered)return;
-    answered=true;
-    const buttons=[...options.querySelectorAll('.option')];
-    buttons.forEach((b,i)=>{b.disabled=true;if(i===current.correctIndex)b.classList.add('correct');else b.classList.add('dim')});
-    btn.classList.remove('dim');
-    const isGood=choice===current.correctIndex;
-    const missed=readSet('complexivo_missed');
-    if(isGood){
-      correct++; missed.delete(current.id);
-      feedback.className='feedback good';
-      feedback.innerHTML='<strong>Respuesta correcta.</strong> Muy bien.';
+    session.log.push({
+      q: item.q,
+      your: letter,
+      yourText: item.options[letter],
+      correct: correct,
+      correctText: item.options[correct],
+      isRight: isRight
+    });
+
+    Array.from(qOptions.children).forEach(function(child, idx){
+      const l = LETTERS[idx];
+      child.classList.add('disabled');
+      if (l === correct){
+        child.classList.add('correct');
+      } else if (l === letter){
+        child.classList.add('incorrect');
+      } else {
+        child.classList.add('dim');
+      }
+    });
+
+    qFeedback.classList.add('show');
+    if (isRight){
+      qFeedback.classList.add('ok');
+      qFeedback.textContent = 'Correcto — ' + correct + '. ' + item.options[correct];
     } else {
-      wrong++; missed.add(current.id); sessionWrong.push(current);
-      btn.classList.add('wrong');
-      const ans=current.display[current.correctIndex].text;
-      feedback.className='feedback bad';
-      feedback.innerHTML='<strong>Respuesta incorrecta.</strong><br>La respuesta correcta es: <strong>'+escapeHtml(ans)+'</strong>';
+      qFeedback.classList.add('bad');
+      qFeedback.textContent = 'Incorrecto — la respuesta es ' + correct + '. ' + item.options[correct];
     }
-    saveSet('complexivo_missed',missed);
-    correctText.textContent=correct; wrongText.textContent=wrong;
-    progress.style.width=(((idx+1)/session.length)*100)+'%';
-    nextBtn.disabled=false;
+
+    qScore.textContent = 'Aciertos: ' + session.correctCount;
+    btnNext.disabled = false;
   }
 
-  function next(){
-    if(!answered)return;
-    idx++;
-    if(idx>=session.length) finish(); else render();
-  }
-
-  function updateFlagButton(){
-    const flagged=readSet('complexivo_flagged');
-    const on=flagged.has(current.id);
-    flagBtn.textContent=on?'Marcada para repasar':'Marcar para repasar';
-    flagBtn.style.borderColor=on?'#f59e0b':'';
-    flagBtn.style.color=on?'#92400e':'';
-    flagBtn.style.background=on?'#fff7ed':'';
-  }
-
-  function toggleFlag(){
-    if(!current)return;
-    const flagged=readSet('complexivo_flagged');
-    flagged.has(current.id)?flagged.delete(current.id):flagged.add(current.id);
-    saveSet('complexivo_flagged',flagged);
-    updateFlagButton();
-  }
-
-  function finish(){
-    clearInterval(timerId);
-    quiz.style.display='none'; result.style.display='block';
-    const elapsed=Math.floor((Date.now()-startedAt)/1000);
-    const pct=Math.round((correct/session.length)*100);
-    $('pctText').textContent=pct+'%';
-    $('scoreRing').style.setProperty('--pct',pct+'%');
-    $('rCorrect').textContent=correct; $('rWrong').textContent=wrong; $('rTime').textContent=fmtTime(elapsed);
-    $('resultTitle').textContent=pct>=80?'Excelente práctica':pct>=60?'Buen avance':'Conviene reforzar';
-    $('resultSub').textContent=`Obtuviste ${correct} de ${session.length} respuestas correctas.`;
-    const best=Number(localStorage.getItem('complexivo_best')||0);
-    if(pct>best) localStorage.setItem('complexivo_best',String(pct));
-    updateBestPill();
-    const review=$('review');
-    if(sessionWrong.length){
-      review.innerHTML='<h3>Preguntas falladas en esta sesión</h3>'+sessionWrong.map((q,n)=>{
-        const ans=q.display[q.correctIndex].text;
-        return `<div class="review-item"><b>${n+1}. ${escapeHtml(q.q)}</b><span>Respuesta correcta: ${escapeHtml(ans)}</span></div>`;
-      }).join('');
-      $('retryWrongBtn').disabled=false;
+  btnNext.addEventListener('click', function(){
+    if (!session.answered) return;
+    const total = session.questions.length;
+    if (session.index < total - 1){
+      session.index++;
+      renderQuestion();
     } else {
-      review.innerHTML='<h3>Sin errores</h3><p style="color:var(--muted)">No fallaste ninguna pregunta en esta sesión.</p>';
-      $('retryWrongBtn').disabled=true;
-    }
-  }
-
-  function backToSetup(){
-    clearInterval(timerId);
-    quiz.style.display='none'; result.style.display='none'; setup.style.display='block';
-  }
-
-  startBtn.addEventListener('click',()=>start());
-  nextBtn.addEventListener('click',next);
-  restartBtn.addEventListener('click',()=>start(modeSelect.value));
-  exitBtn.addEventListener('click',backToSetup);
-  flagBtn.addEventListener('click',toggleFlag);
-  $('againBtn').addEventListener('click',backToSetup);
-  $('retryWrongBtn').addEventListener('click',()=>{modeSelect.value='missed';countSelect.value='all';start('missed')});
-  clearHistoryBtn.addEventListener('click',()=>{
-    if(confirm('¿Deseas borrar el historial de preguntas falladas, marcadas y mejor resultado?')){
-      localStorage.removeItem('complexivo_missed');
-      localStorage.removeItem('complexivo_flagged');
-      localStorage.removeItem('complexivo_best');
-      updateBestPill();
-      setupMsg.textContent='Historial borrado.';
-      setTimeout(()=>setupMsg.textContent='',1800);
+      progressFill.style.width = '100%';
+      showResults();
     }
   });
 
-  document.addEventListener('keydown',e=>{
-    if(quiz.style.display!=='block')return;
-    if(!answered && ['1','2','3','4'].includes(e.key)){
-      const i=Number(e.key)-1;
-      const b=options.querySelectorAll('.option')[i]; if(b)b.click();
-    } else if(e.key==='Enter' && answered){
-      next();
-    } else if(e.key.toLowerCase()==='m'){
-      toggleFlag();
+  btnQuit.addEventListener('click', function(){
+    if (confirm('¿Salir del repaso? Se perderá el progreso de esta ronda.')){
+      screenQuiz.classList.add('hidden');
+      screenSetup.classList.remove('hidden');
     }
   });
 
-  updateBestPill();
+  btnRestart.addEventListener('click', function(){
+    screenResults.classList.add('hidden');
+    screenSetup.classList.remove('hidden');
+  });
+
+  function showResults(){
+    screenQuiz.classList.add('hidden');
+    screenResults.classList.remove('hidden');
+
+    const total = session.questions.length;
+    const pct = Math.round((session.correctCount / total) * 100);
+    resPct.textContent = pct + '%';
+    resLbl.textContent = pct >= 70 ? 'Aprobado' : 'A repasar';
+    resTitle.textContent = pct >= 70 ? 'Buen dominio del tema' : 'Sigue repasando';
+    resSummary.textContent = session.correctCount + ' de ' + total + ' respuestas correctas.';
+
+    const wrong = session.log.filter(function(l){ return !l.isRight; });
+    reviewList.innerHTML = '';
+    if (wrong.length === 0){
+      const div = document.createElement('div');
+      div.className = 'review-item';
+      div.textContent = 'Ninguna respuesta incorrecta en esta ronda. Excelente trabajo.';
+      reviewList.appendChild(div);
+    } else {
+      const heading = document.createElement('div');
+      heading.style.fontFamily = 'var(--mono)';
+      heading.style.fontSize = '11px';
+      heading.style.letterSpacing = '0.1em';
+      heading.style.textTransform = 'uppercase';
+      heading.style.color = 'var(--paper-dim)';
+      heading.textContent = 'Para repasar (' + wrong.length + ')';
+      reviewList.appendChild(heading);
+      wrong.forEach(function(l){
+        const div = document.createElement('div');
+        div.className = 'review-item wrong';
+        div.innerHTML = '<div class="rq">' + l.q + '</div>' +
+          '<div class="ra you">Tu respuesta: ' + l.your + '. ' + l.yourText + '</div>' +
+          '<div class="ra right">Correcta: ' + l.correct + '. ' + l.correctText + '</div>';
+        reviewList.appendChild(div);
+      });
+    }
+  }
 })();
 </script>
 </body>
